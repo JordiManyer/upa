@@ -12,8 +12,11 @@
 ///    · Works for any non-singular matrix. Not precise for near-singular cases.
 ///    · WARNING: A is destroyed in the process.
 void LU(int n, double* A, int* P) {
-    int pivot;
+    int pivot, iaux;
     double sum, max, aux;
+
+    // Initialize permutation vector
+    for (int k = 0; k < n; ++k) P[k] = k;
 
     // For all columns
     for (int k = 0; k < n ; ++k) {
@@ -23,16 +26,20 @@ void LU(int n, double* A, int* P) {
             max = fabs(A[k*n + j]);
             pivot = j;
         }
-        P[k] = pivot;
 
         // If needed, issue conditioning warning:
         if (max < 1.e-3) std::cout << "WARNING from LU -> Matrix is bad conditioned!" << std::endl;
 
         // If needed, swap rows
-        if (pivot != k) for (int j = 0; j < n; ++j) {
+        if (pivot != k) { 
+            for (int j = 0; j < n; ++j) {
                 aux = A[k*n + j];
                 A[k*n + j] = A[pivot*n + j];
                 A[pivot*n + j] = aux;
+            }
+            iaux = P[k];
+            P[k] = P[pivot];
+            P[pivot] = iaux;
         }
 
         // We calculate the kth row of U
