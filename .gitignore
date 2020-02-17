@@ -1,0 +1,11 @@
+# UPA binary
+/upa
+
+# VS Code
+/.vscode
+/.idea
+
+# temporary and backup files
+*~
+*#
+*.swp

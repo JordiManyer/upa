@@ -1,10 +1,10 @@
-# upa
+# UPA
 Aquest és l'inici d'una aventura ...
 
 
-Linear solvers: 
+Linear solvers:
 
-	Implemented: 
+	Implemented:
 
 		- c++ and f90 LU decomp with partial pivoting  -> All non-singular matrixes work; overwrites initial matrix
 
