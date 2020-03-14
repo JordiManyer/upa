@@ -10,8 +10,8 @@ FLAGS_F90 = -O0 -fdefault-real-8
 # ----------------------------------------------------------
 # Source files 
 TEST_CPP = test_utils.cpp
-SRC_CPP  = $(filter-out $(TEST_CPP), $(wildcard *.cpp) $(wildcard ../solvers/linearSolvers.cpp))
-HEAD_CPP = $(wildcard *.h) $(wildcard ../solvers/linearSolvers.h)
+SRC_CPP  = $(filter-out $(TEST_CPP), $(wildcard *.cpp) $(wildcard ../solvers/directSolvers.cpp))
+HEAD_CPP = $(wildcard *.h) $(wildcard ../solvers/directSolvers.h)
 OBJS_CPP = $(SRC_CPP:.cpp=.o)
 
 

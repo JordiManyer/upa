@@ -9,12 +9,12 @@ FLAGS_F90 = -O0 -fdefault-real-8
 
 # ----------------------------------------------------------
 # Source files 
-TEST_CPP = test_linearSolvers.cpp
+TEST_CPP = test_directSolvers.cpp
 SRC_CPP  = $(filter-out $(TEST_CPP), $(wildcard *.cpp))
 HEAD_CPP = $(wildcard *.h)
 OBJS_CPP = $(SRC_CPP:.cpp=.o)
 
-TEST_F90 = test_linearSolvers.f90
+TEST_F90 = test_directSolvers.f90
 SRC_F90  = $(filter-out $(TEST_F90), $(wildcard *.f90))
 OBJS_F90 = $(SRC_F90:.f90=.o)
 MOD_F90  = $(SRC_F90:.f90=.mod)

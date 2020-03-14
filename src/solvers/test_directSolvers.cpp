@@ -1,7 +1,8 @@
 using namespace std;
 
 #include <iostream>
-#include "linearSolvers.h"
+#include "directSolvers.h"
+#include "conjugateGradient.h"
 
 
 void testLU();
@@ -13,6 +14,9 @@ int main() {
 
     cout << endl << "Testing LU: " << endl;
     testLU();
+
+    cout << endl << "Testing CG: " << endl;
+
     return 0;
 }
 
@@ -85,6 +89,42 @@ void testLU() {
         cout << P[i] << " , ";
     }
     cout << endl;
+
+    cout << "x = " << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << x[i] << " , ";
+    }
+    cout << endl;
+}
+
+
+void testCG() {
+    int n = 3;
+    double M[n*n], b[n], x[n], x0[n], r[n];
+
+    // Input
+    M[0] = 2.0; M[1] = -1.0; M[2] = 0.0;
+    M[3] = -1.0; M[4] = 2.0; M[5] = -1.0;
+    M[6] = 0.0; M[7] = -1.0; M[8] = 2.0;
+
+    b[0] = 1.0; b[1] = 2.0; b[2] = 3.0;
+
+    x0[0] = 1.0; x0[1] = 1.0; x0[2] = 1.0;
+
+
+    // Solve system
+    conjugateGradient CG(n, &M, &b);
+    CG.configure(1.e-12, false, 1);
+    CG.solve(&x0);
+
+    CG.getSolution(&x);
+    CG.getResidual(&r);
+
+    // Output
+
+    cout << "Converged : " << CG.getConvergence() << endl;
+    cout << "Number of iterations: " << CG.getNumIter() << endl
+    cout << "Error : " << CG.getError();
 
     cout << "x = " << endl;
     for (int i = 0; i < n; ++i) {

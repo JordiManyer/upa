@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "fitters.h"
-#include "../solvers/linearSolvers.h"
+#include "../solvers/directSolvers.h"
 
 double phi(double x, double rho);
 void Basis(double x , int degree, double* P);
