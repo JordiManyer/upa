@@ -1,6 +1,10 @@
 # UPA binary
 /upa
 
+# Test binaries
+/tests/test_directSolvers
+/tests/test_utils
+
 # VS Code
 /.vscode
 /.idea

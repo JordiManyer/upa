@@ -1,5 +1,5 @@
-#include "fitters.h"
-#include "interpolators.h"
+#include "utils/fitters.h"
+#include "utils/interpolators.h"
 #include <math.h>
 #include <iostream>
 

@@ -9,8 +9,8 @@ class sparse_CSC {
 private:
     int n;
     int nonzeros;
-    double* rows;
-    double* cols;
+    int* rows;
+    int* cols;
     double* values;
 
 

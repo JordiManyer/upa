@@ -1,7 +1,7 @@
 
 #include "conjugateGradient.h"
 #include <math.h>
-
+#include <iostream>
 
 /*****************************************************************************************
  *************************              CONSTRUCTOR              *************************
@@ -28,7 +28,7 @@ conjugateGradient::conjugateGradient(int problemSize, double* problemMatrix, dou
 /*****************************************************************************************
  *************************        OPTIONS AND PARAMETERS         *************************
  *****************************************************************************************/
-void conjugateGradient::configure(double tolerance, bool isSparse = false, int beVerbose = 0){
+void conjugateGradient::configure(double tolerance, bool isSparse, int beVerbose){
     sparse  = isSparse;
     verbose = beVerbose;
     tol     = tolerance;
@@ -50,6 +50,7 @@ void conjugateGradient::solveDense(double* x0){
         Adk[i] = 0.0;
         for (int j = 0; j < n; ++j) Adk[i] += A[i*n + j]*x0[j];
 
+        xk[i] = x0[i];
         rk[i] = b[i] - Adk[i];
         dk[i] = rk[i];
         err += rk[i]*rk[i];
@@ -57,12 +58,11 @@ void conjugateGradient::solveDense(double* x0){
     err = sqrt(err);
 
     /// Main Loop :
-    while ( err < tol and k < n+1 ) {
-
+    while ( err > tol and k < 2*n ) {
         // Calculate A * dk
         for (int i = 0; i < n; ++i) {
             Adk[i] = 0.0;
-            for (int j = 0; j < n; ++j) Adk[i] += A[i * n + j] * x0[j];
+            for (int j = 0; j < n; ++j) Adk[i] += A[i * n + j] * dk[j];
         }
 
         // alpha = (dk·rk) / (dk·A·dk)
@@ -93,8 +93,11 @@ void conjugateGradient::solveDense(double* x0){
         for (int i = 0; i < n; ++i) dk[i] = rk[i] + beta * dk[i];
 
         // Update stop conditions
-        err = 0.0;
-        for (int i = 0; i < n; ++i) err += rk[i]*rk[i];
+        err = 0.0; double orthogonal = 0;
+        for (int i = 0; i < n; ++i) {
+            orthogonal += rk[i]*rkold[i];
+            err += rk[i] * rk[i];
+        }
         ++k;
     }
 

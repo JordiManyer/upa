@@ -6,7 +6,7 @@
 
 double sparse_CSR::get(int i, int j) {
     for (int k = rows[i]; k < rows[i+1]; ++k) {
-        if ( cols[k] = j) return values[k];
+        if ( cols[k] == j) return values[k];
     }
     return 0.0;
 }

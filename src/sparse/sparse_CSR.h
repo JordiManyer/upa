@@ -9,13 +9,12 @@ class sparse_CSR {
 private:
     int n;
     int nonzeros;
-    double* rows;
-    double* cols;
+    int* rows;
+    int* cols;
     double* values;
 
 
 public:
-
     sparse_CSR();
 
     double get(int i, int j);

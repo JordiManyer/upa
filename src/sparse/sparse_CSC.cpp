@@ -5,7 +5,7 @@
 
 double sparse_CSC::get(int i, int j) {
     for (int k = cols[j]; k < cols[j+1]; ++k) {
-        if ( rows[k] = i) return values[k];
+        if ( rows[k] == i) return values[k];
     }
     return 0.0;
 }

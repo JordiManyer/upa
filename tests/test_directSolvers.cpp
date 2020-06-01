@@ -1,12 +1,13 @@
 using namespace std;
 
 #include <iostream>
-#include "directSolvers.h"
-#include "conjugateGradient.h"
+#include "solvers/directSolvers.h"
+#include "solvers/conjugateGradient.h"
 
 
 void testLU();
 void testChol();
+void testCG();
 
 int main() {
     cout << "Testing Cholesky: " << endl;
@@ -16,6 +17,7 @@ int main() {
     testLU();
 
     cout << endl << "Testing CG: " << endl;
+    testCG();
 
     return 0;
 }
@@ -54,6 +56,16 @@ void testChol() {
         cout << x[i] << " , ";
     }
     cout << endl;
+
+    double err = 0; double aux;
+    for (int i = 0; i < n; ++i) {
+        aux = 0;
+        for (int j = 0; j < n; ++j) {
+            aux += M[i*n+j]*x[j];
+        }
+        err += (b[i]-aux)*(b[i]-aux);
+    }
+    cout << "Error : " << err << endl;
 }
 
 void testLU() {
@@ -97,7 +109,6 @@ void testLU() {
     cout << endl;
 }
 
-
 void testCG() {
     int n = 3;
     double M[n*n], b[n], x[n], x0[n], r[n];
@@ -113,18 +124,27 @@ void testCG() {
 
 
     // Solve system
-    conjugateGradient CG(n, &M, &b);
-    CG.configure(1.e-12, false, 1);
-    CG.solve(&x0);
+    conjugateGradient CG(n, M, b);
+    CG.configure(0.000001, false, 1);
+    CG.solve(x0);
 
-    CG.getSolution(&x);
-    CG.getResidual(&r);
+    CG.getSolution(x);
+    CG.getResidual(r);
+
+    double err = 0; double aux;
+    for (int i = 0; i < n; ++i) {
+        aux = 0;
+        for (int j = 0; j < n; ++j) {
+            aux += M[i*n+j]*x[j];
+        }
+        err += (b[i]-aux)*(b[i]-aux);
+    }
+    cout << "Error1 : " << err << endl;
 
     // Output
-
     cout << "Converged : " << CG.getConvergence() << endl;
-    cout << "Number of iterations: " << CG.getNumIter() << endl
-    cout << "Error : " << CG.getError();
+    cout << "Number of iterations: " << CG.getNumIter() << endl;
+    cout << "Error2 : " << CG.getError() << endl;
 
     cout << "x = " << endl;
     for (int i = 0; i < n; ++i) {
