@@ -2,6 +2,14 @@
 
 #include "sparse_CSC.h"
 
+sparse_CSC::sparse_CSC(int dimension, int nonzeros) {
+    n = dimension;
+    nnz = nonzeros;
+
+    cols = new int[n+1];
+    rows = new int[nnz];
+    values = new double[nnz];
+}
 
 double sparse_CSC::get(int i, int j) {
     for (int k = cols[j]; k < cols[j+1]; ++k) {

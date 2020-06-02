@@ -5,7 +5,7 @@
 
 sparse_LIL::sparse_LIL(int number_of_rows) {
     n = number_of_rows;
-    num_non_zeros = 0;
+    nnz = 0;
     max_col_size = 0;
     A = new std::vector <std::pair <int,double>> [n];
 }
@@ -17,6 +17,7 @@ void sparse_LIL::assemble_elem(int i, int j, double value){
     if (it == A[i].end()) { // Element does not exist --> Create element
         A[i].push_back( std::make_pair(j,value) );
         sort(A[i].rbegin(), A[i].rend());
+        ++nnz;
     } else { // Element already exists --> Add value to element
         it->second += value;
     }

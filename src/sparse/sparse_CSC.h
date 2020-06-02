@@ -4,19 +4,19 @@
 #define UPA_SPARSE_CSC_H
 
 
+// Compressed Storage Column-major
 class sparse_CSC {
 
-private:
-    int n;
-    int nonzeros;
-    int* rows;
-    int* cols;
-    double* values;
-
-
 public:
+    // VARIABLES
+    int n;          // Size of the matrix
+    int nnz;        // Number of non-zero elements
+    int* cols;      // Size n, list of first indexes
+    int* rows;      // Size nnz, indexes
+    double* values; // Size nnz, values
 
-    sparse_CSC();
+    // METHODS
+    sparse_CSC(int dimension, int nonzeros);
 
     double get(int i, int j);
     void matvec(double* x, double* y);

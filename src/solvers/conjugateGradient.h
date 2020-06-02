@@ -1,10 +1,9 @@
-//
-// Created by bscuser on 3/6/20.
-//
+
 
 #ifndef UPA_COJUGATEGRADIENT_H
 #define UPA_COJUGATEGRADIENT_H
 
+#include "sparse/sparse.h"
 
 class conjugateGradient {
 
@@ -12,6 +11,7 @@ private:
     /// Inputs
     int n;
     double* A;
+    sparse_CSR* AS;
     double* b;
 
     /// Parameters
@@ -32,8 +32,9 @@ private:
 
 public:
 
-    /// Constructor
-    conjugateGradient(int problemSize, double* problemMatrix, double* problemVector);
+    /// Constructors
+    conjugateGradient(int problemSize, double* problemMatrix, double* problemVector); // dense
+    conjugateGradient(int problemSize, sparse_CSR* problemMatrix, double* problemVector); //sparse
 
     /// Modify default parameters
     void configure(double tolerance, bool isSparse = false, int beVerbose = 0);

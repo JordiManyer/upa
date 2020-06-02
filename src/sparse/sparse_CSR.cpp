@@ -2,6 +2,14 @@
 
 #include "sparse_CSR.h"
 
+sparse_CSR::sparse_CSR(int dimension, int nonzeros) {
+    n = dimension;
+    nnz = nonzeros;
+
+    rows = new int[n+1];
+    cols = new int[nnz];
+    values = new double[nnz];
+}
 
 
 double sparse_CSR::get(int i, int j) {

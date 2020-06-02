@@ -4,6 +4,7 @@
 # Test binaries
 /tests/test_directSolvers
 /tests/test_utils
+/tests/test_sparse
 
 # VS Code
 /.vscode

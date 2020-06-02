@@ -16,6 +16,7 @@ LIBS      = upa.a
 all: $(LIBS)
 	$(CC) tests/test_directSolvers.cpp $(FLAGS_CC) -o tests/test_directSolvers $(LIBS) -I$(LIBS_INCL)
 	$(CC) tests/test_utils.cpp $(FLAGS_CC) -o tests/test_utils $(LIBS) -I$(LIBS_INCL)
+	$(CC) tests/test_sparse.cpp $(FLAGS_CC) -o tests/test_sparse $(LIBS) -I$(LIBS_INCL)
 	$(CC) upa.cc $(FLAGS_CC) -o upa $(LIBS) -I$(LIBS_INCL)
 
 # -----------------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ $(LIBS): $(LIBS_OBJ)
 $(LIBS_OBJ) : $(LIBS_SRC) $(LIBS_HEAD)
 
 %.o: %.cpp $(LIBS_HEAD)
-	$(CC) $(FLAGS_CC) -c -o $@ $<
+	$(CC) $(FLAGS_CC) -c -o $@ $< -I$(LIBS_INCL)
 
 clean :
-	rm src/solvers/*.o src/sparse/*.o src/utils/*.o
+	rm src/solvers/*.o src/sparse/*.o src/utils/*.o upa.a
