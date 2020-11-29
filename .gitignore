@@ -1,16 +1,12 @@
-# UPA binary
-/upa
-
-# Test binaries
-/tests/test_directSolvers
-/tests/test_utils
-/tests/test_sparse
 
 # VS Code
 /.vscode
 /.idea
+/cmake-build-debug
 
 # temporary and backup files
 *~
 *#
 *.swp
+
+
