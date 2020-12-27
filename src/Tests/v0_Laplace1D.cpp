@@ -101,20 +101,6 @@ int main() {
         }
     }
 
-    /// Dirichlet BCs (Lagrange multipliers)
-    // TODO: This breaks symmetry of the matrix -> Needs GMRES
-/*    for (int d = 0; d < nN; ++d) {
-        double coords[dim]; mesh->getNodeCoords(d, coords);
-        double value = 0.0;
-
-        bool boundary = fabs(coords[0] - 0.0) < 1.e-5;
-        if (boundary) {
-            sysK->removeRow(d);
-            sysK->put(d,d,1.0);
-            sysF[d] = value;
-        }
-    }*/
-
     /// Dirichlet BCs (Elimination)
     bool select[nN]; int nSelect = 0;
     for (int d = 0; d < nN; ++d) {
@@ -160,7 +146,8 @@ int main() {
     /// Solve system
     // Create solver
     auto CG = new Solver_CG(nSelect,sysK_solve,sysF_solve);
-    CG->configure(0.000001, 1);
+    CG->setTolerance(0.000001);
+    CG->setVerbosity(1);
 
     // Solve
     double x0[nSelect];

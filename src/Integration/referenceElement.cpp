@@ -9,9 +9,9 @@ namespace upa {
 
             if      (etype == ElemType::Line  ) _fillRefElem<ElemType::Line, BFType::Lagrangian>(bforder);
             else if (etype == ElemType::Square) _fillRefElem<ElemType::Square, BFType::Lagrangian>(bforder);
-            else throw std::runtime_error("femplas_ReferenceElement: ElemType not implemented.");
+            else throw std::runtime_error("ReferenceElement: ElemType not implemented.");
 
-        } else throw std::runtime_error("femplas_ReferenceElement: BFtype not implemented.");
+        } else throw std::runtime_error("ReferenceElement: BFtype not implemented.");
     }
 
 
@@ -50,7 +50,7 @@ namespace upa {
                 break;
 
             default:
-                throw std::runtime_error("femplas_ReferenceElement: BF order not implemented.");
+                throw std::runtime_error("ReferenceElement: BF order not implemented.");
         }
     }
 
@@ -94,7 +94,7 @@ namespace upa {
                 break;
 
             default:
-                throw std::runtime_error("femplas_ReferenceElement: BF order not implemented.");
+                throw std::runtime_error("ReferenceElement: BF order not implemented.");
         }
     }
 

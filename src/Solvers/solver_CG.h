@@ -18,18 +18,8 @@ namespace upa {
         Solver_CG(int problemSize, Sparse_CSR* problemMatrix, double *problemVector);
         ~Solver_CG() override = default;
 
-        /// Modify default parameters
-        void configure(double tolerance, int beVerbose) override;
-
         /// Solve the system using the conjugate gradient method
         void solve(double *x0) override;
-
-        /// Getters
-        bool getConvergence() override;
-        void getSolution(double *x) override;
-        void getResidual(double *x) override;
-        int getNumIter() override;
-        double getError() override;
 
     };
 

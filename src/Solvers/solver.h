@@ -5,7 +5,6 @@
 
 #include "sparse_CSR.h"
 
-
 namespace upa {
 
     class Solver {
@@ -29,21 +28,23 @@ namespace upa {
 
     public:
 
-        /// Destructor
+        /// Constructor & Destructor
+        Solver() = default;
         virtual ~Solver() = default;
 
         /// Setup
-        virtual void configure(double tolerance, int beVerbose) = 0;
+        void setTolerance(double tolerance);
+        void setVerbosity(int verbosity);
 
         /// Solve
         virtual void solve(double *x0) = 0;
 
         /// Getters
-        virtual bool getConvergence() = 0;
-        virtual void getSolution(double *x) = 0;
-        virtual void getResidual(double *x) = 0;
-        virtual int getNumIter() = 0;
-        virtual double getError() = 0;
+        virtual bool getConvergence();
+        virtual void getSolution(double *x);
+        virtual void getResidual(double *x);
+        virtual int getNumIter();
+        virtual double getError();
 
     };
 

@@ -21,7 +21,7 @@ set(UPA_LIBRARIES CACHE INTERNAL "UPA_LIBRARIES")
 file(GLOB UPA_INC_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/*)
 include_directories(${UPA_INC_DIRS})
 
-# Build FEMPlas
+# Build UPA
 add_subdirectory(src/Math)           # Basic Math
 add_subdirectory(src/Sparse)         # Sparse Matrices
 add_subdirectory(src/Solvers)        # Sparse Solvers

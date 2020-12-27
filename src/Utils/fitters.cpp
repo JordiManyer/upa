@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "fitters.h"
-#include "../Solvers/directSolvers.h"
+#include "directSolvers.h"
 
 double phi(double x, double rho);
 void Basis(double x , int degree, double* P);
@@ -133,6 +133,7 @@ void Basis(double x , int degree, double* P) {
         std::cerr << " ERROR from FITTERS: Degree not implemented!!" << std::endl;
     }
 }
+
 void DBasis(double x , int degree, double* P) {
     if (degree == 0) {
         P[0] = 0;

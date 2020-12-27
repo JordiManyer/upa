@@ -23,17 +23,15 @@ namespace upa {
         finalError = -1;
 
         // Set default parameters
-        configure(1.e-12, 0);
+        tol = 1.e-12;
+        verbose = 0;
     }
 
 
 /*****************************************************************************************
  *************************        OPTIONS AND PARAMETERS         *************************
  *****************************************************************************************/
-    void Solver_CG::configure(double tolerance, int beVerbose) {
-        verbose = beVerbose;
-        tol = tolerance;
-    }
+
 
 
 /*****************************************************************************************
@@ -59,7 +57,7 @@ namespace upa {
         err = sqrt(err);
 
         /// Main Loop :
-        while (err > tol and k < 2 * n) {
+        while (err > tol and k < n * n) {
             // Calculate A * dk
             A->matvec(dk, Adk);
 
@@ -103,7 +101,7 @@ namespace upa {
         }
 
         /// Save outputs:
-        if (k == n + 1) hasConverged = false;
+        if (k == n * n) hasConverged = false;
         else hasConverged = true;
 
         for (int i = 0; i < n; ++i) {
@@ -112,29 +110,6 @@ namespace upa {
         }
         numIter = k;
         finalError = err;
-    }
-
-    /***********************************************************
-    *********                GETTERS                ************
-    ************************************************************/
-    bool Solver_CG::getConvergence() {
-        return hasConverged;
-    }
-
-    void Solver_CG::getSolution(double *x) {
-        for (int i = 0; i < n; ++i) x[i] = sol[i];
-    }
-
-    void Solver_CG::getResidual(double *r) {
-        for (int i = 0; i < n; ++i) r[i] = residual[i];
-    }
-
-    int Solver_CG::getNumIter() {
-        return numIter;
-    }
-
-    double Solver_CG::getError() {
-        return finalError;
     }
 
 }

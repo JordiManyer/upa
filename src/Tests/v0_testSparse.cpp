@@ -37,7 +37,8 @@ int main() {
 
     // Solve system
     Solver_CG CG(n, &csr, b);
-    CG.configure(0.000001, 1);
+    CG.setTolerance(0.000001);
+    CG.setVerbosity(1);
     CG.solve(x0);
 
     CG.getSolution(x);

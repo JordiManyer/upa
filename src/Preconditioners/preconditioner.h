@@ -3,6 +3,7 @@
 #define UPA_PRECONDITIONER_H
 
 #include <string>
+#include "sparse_CSR.h"
 
 namespace upa {
 
@@ -11,15 +12,15 @@ namespace upa {
         std::string type;
         int n;
         double *D;
-        sparse_CSR *M;
+        Sparse_CSR *M;
 
     public:
         // Constructor
         preconditioner();
 
         // Preconditioners
-        void jacobi(sparse_CSR *A);           // Jacobi Preconditioner
-        void ssor(sparse_CSR *A, double w);  // Symmetric SOR Preconditioner
+        void jacobi(Sparse_CSR *A);           // Jacobi Preconditioner
+        void ssor(Sparse_CSR *A, double w);  // Symmetric SOR Preconditioner
 
         // Solve Preconditioner
         void solve(double *x, double *y);         // Generic

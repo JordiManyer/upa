@@ -9,8 +9,8 @@ namespace upa {
     }
 
     // Build the Jacobi preconditioner
-    void preconditioner::jacobi(sparse_CSR *A) {
-        type = new std::string
+    void preconditioner::jacobi(Sparse_CSR *A) {
+        type = ""
         "jacobi";
         n = A->n;
 
@@ -25,18 +25,17 @@ namespace upa {
                     found = true;
                 }
             }
-            if (found == false) diag[i] = 0; // WARNING : Output error!!
+            if (found == false) D[i] = 0; // WARNING : Output error!!
         }
     }
 
     // Build the SSOR preconditioner
-    void preconditioner::ssor(sparse_CSR *A, double w) {
-        type = new std::string
-        "ssor";
+    void preconditioner::ssor(Sparse_CSR *A, double w) {
+        type = "ssor";
         n = A->n;
 
         // M = LU,   with   L = I - w E inv(D)   and   U = D - w F
-        M = new sparse_CSR(A->n, A->nnz);
+        M = new Sparse_CSR(A->n, A->nnz);
         bool found;
         for (int i = 0; i < n; ++i) {
             M->rows[i] = A->rows[i];
@@ -72,14 +71,18 @@ namespace upa {
 
     // General solver
     void preconditioner::solve(double *x, double *y) {
-        if (type == "jacobi") solve_jacobi(double * x, double * y);
-        else if (type == "ssor") solve_ssor(double * x, double * y);
+        if      (type == "jacobi") solve_jacobi (double *x, double *y);
+        else if (type == "ssor")   solve_ssor   (double *x, double *y);
     }
 
     // Jacobi Solver
-    void preconditioner::solve_jacobi(double *x, double *y);
+    void preconditioner::solve_jacobi(double *x, double *y) {
+
+    }
 
     // SSOR Solver
-    void preconditioner::solve_ssor(double *x, double *y);
+    void preconditioner::solve_ssor(double *x, double *y) {
+
+    }
 
 }
