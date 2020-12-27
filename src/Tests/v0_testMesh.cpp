@@ -11,7 +11,7 @@ int main() {
 
     int dim = 2;
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,2,ElemType::Square);
+    mesh->produceCartesian(dim,3,ElemType::Square);
 
     int nE = mesh->getNumElements();
     int nN = mesh->getNumNodes();

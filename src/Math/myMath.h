@@ -23,9 +23,6 @@ namespace upa {
     void inverse2x2(const double* A, double* Ainv);
 
 
-
-
-
 }
 
 #endif //UPA_MYMATH_H
