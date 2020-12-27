@@ -38,6 +38,7 @@ namespace upa {
 
         void matvec(double *x, double *y);
         void getDiag();
+        void getDiag(double* D);
     };
 }
 

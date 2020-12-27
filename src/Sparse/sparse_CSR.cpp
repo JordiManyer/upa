@@ -25,6 +25,7 @@ namespace upa {
         cols = new int[nnz];
         values = new double[nnz];
 
+        rows[0] = 0;
         int k = 0;
         for (int i = 0; i < lil->n; ++i) {
             rows[i + 1] = rows[i] + lil->A[i].size();
@@ -104,10 +105,23 @@ namespace upa {
                     found = true;
                 }
             }
-            if (not found) diag[i] = -1; // WARNING : What value should be default?
+            if (not found) diag[i] = -1;
         }
     }
 
+    void Sparse_CSR::getDiag(double* D) {
+        bool found;
+        for (int i = 0; i < n; ++i) {
+            found = false;
+            for (int k = rows[i]; k < rows[i + 1] and not found; ++k) {
+                if (cols[k] == i) {
+                    D[i] = values[k];
+                    found = true;
+                }
+            }
+            if (not found) D[i] = 0.0;
+        }
+    }
 
 }
 
