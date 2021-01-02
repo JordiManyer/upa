@@ -3,9 +3,17 @@
 #include "sparse_LIL.h"
 #include "sparse_CSR.h"
 #include "solver_AMG.h"
+#include "debugIO.h"
 
 using namespace std;
 using namespace upa;
+
+/*template <typename T>
+void printArray(size_t n, const T arr[]) {
+    std::cout << std::endl;
+    for (size_t i = 0; i < n; ++i) std::cout << arr[i] << " ";
+    std::cout << std::endl;
+}*/
 
 
 int main() {
@@ -65,9 +73,7 @@ int main() {
     cout << "Final error = " << error << endl;
 
     cout << "x = " << endl;
-    for (int i = 0; i < n; ++i) {
-        cout << xkp1[i] << " , ";
-    }
-    cout << endl;
+    printArray(n,xkp1);
+
 
 }
