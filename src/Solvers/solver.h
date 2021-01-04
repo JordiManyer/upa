@@ -18,6 +18,7 @@ namespace upa {
         /// Parameters
         int verbose;
         double tol;
+        int maxIter;
 
         /// Outputs
         bool hasConverged;
@@ -34,6 +35,7 @@ namespace upa {
 
         /// Setup
         void setTolerance(double tolerance);
+        void setIterations(int maxNumIter);
         void setVerbosity(int verbosity);
 
         /// Solve

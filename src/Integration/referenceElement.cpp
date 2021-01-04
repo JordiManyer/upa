@@ -99,26 +99,4 @@ namespace upa {
     }
 
 
-
-/*
-
-    case 1
-
-    z = [-1/sqrt(3) -1/sqrt(3); 1/sqrt(3) -1/sqrt(3); 1/sqrt(3) 1/sqrt(3) ; -1/sqrt(3) 1/sqrt(3)];
-    w = [1 1 1 1];
-    xi = z(:,1); eta=z(:,2);
-    N = [(xi-1).*(eta-1)/4,   -(xi+1).*(eta - 1)/4 ,   (xi + 1).*(eta+1)/4 , -(xi-1).*(eta+1)/4];
-    Nxi  = [(eta-1)/4,   -(eta - 1)/4 ,   (eta+1)/4 , -(eta+1)/4];
-    Neta = [(xi-1)/4,   -(xi+1)/4 ,   (xi + 1)/4 , -(xi-1)/4];
-    nodesCoord = [-1,-1;1,-1;1,1;-1,1];
-
-*/
-
-
-
-
-
-
-
-
 }

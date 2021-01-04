@@ -22,14 +22,16 @@ file(GLOB UPA_INC_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/*)
 include_directories(${UPA_INC_DIRS})
 
 # Build UPA
-add_subdirectory(src/Math)           # Basic Math
-add_subdirectory(src/Sparse)         # Sparse Matrices
-add_subdirectory(src/Solvers)        # Sparse Solvers
-add_subdirectory(src/StructuredMesh) # Meshes
 add_subdirectory(src/Integration)    # Integration
+add_subdirectory(src/IO)             # Input/Output routines
+add_subdirectory(src/Math)           # Basic Math
+add_subdirectory(src/Solvers)        # Sparse Solvers
+add_subdirectory(src/Sparse)         # Sparse Matrices
+add_subdirectory(src/StructuredMesh) # Meshes
 add_subdirectory(src/Utils)          # Utils
 
-add_subdirectory(src/Tests) # Executables
+add_subdirectory(src/Tests)          # Executables
+
 
 
 

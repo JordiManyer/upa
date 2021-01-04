@@ -24,6 +24,7 @@ namespace upa {
 
         // Set default parameters
         tol = 1.e-12;
+        maxIter = 2 * n;
         verbose = 0;
     }
 
@@ -57,7 +58,7 @@ namespace upa {
         err = sqrt(err);
 
         /// Main Loop :
-        while (err > tol and k < n * n) {
+        while (err > tol and k < maxIter) {
             // Calculate A * dk
             A->matvec(dk, Adk);
 

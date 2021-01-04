@@ -11,6 +11,10 @@ namespace upa {
         tol = tolerance;
     }
 
+    void Solver::setIterations(int maxNumIter) {
+        maxIter = maxNumIter;
+    }
+
     void Solver::setVerbosity(int verbosity) {
         verbose = verbosity;
     }
@@ -39,7 +43,6 @@ namespace upa {
     double Solver::getError() {
         return finalError;
     }
-
 
 
 }
