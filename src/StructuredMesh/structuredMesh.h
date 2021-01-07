@@ -28,6 +28,16 @@ namespace upa {
         void getElemCoords(int e, double *dofCoords);
         void getNodeCoords(int d, double *dofCoords);
 
+        // Auxiliar functions
+
+        /** @brief Returns true if the point given by 'coords' is inside the element 'elem'
+         */
+        bool isInsideElement(int elem, double* coords);
+
+        /** @brief Fills 'coords' with the baricenter coordinates of the element 'elem'
+         */
+        void getElemBarycenter(int elem, double* coords);
+
     private:
         int _nElems; // Number of elements in the mesh
         int _nNodes; // Number of nodes in the mesh

@@ -11,7 +11,7 @@ int main() {
 
     int dim = 2;
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,3,ElemType::Square);
+    mesh->produceCartesian(dim,2,ElemType::Square);
 
     int nE = mesh->getNumElements();
     int nN = mesh->getNumNodes();
@@ -32,5 +32,8 @@ int main() {
         }
         cout << endl;
     }
+
+    double p[2] = {0.3,0.8};
+    for (int e = 0; e < nE; ++e) if (mesh->isInsideElement(e,p)) cout << "Selected point is inside element " << e << endl;
 
 }
