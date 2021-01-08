@@ -82,14 +82,14 @@ namespace upa {
 
                     _bf[iG*_nB + 0] = (xi-1)*(eta-1)/4;
                     _bf[iG*_nB + 1] = -(xi+1)*(eta-1)/4;
-                    _bf[iG*_nB + 2] = -(xi-1)*(eta+1)/4;
-                    _bf[iG*_nB + 3] = (xi+1)*(eta+1)/4;
+                    _bf[iG*_nB + 2] = (xi+1)*(eta+1)/4;
+                    _bf[iG*_nB + 3] = -(xi-1)*(eta+1)/4;
 
                     // dbf/dxi; dbf/deta
                     _dbf[iG*_nB*_dim + 0*_dim + 0] = (eta-1)/4 ;   _dbf[iG*_nB*_dim + 0*_dim + 1] = (xi-1)/4 ;
                     _dbf[iG*_nB*_dim + 1*_dim + 0] = -(eta-1)/4;   _dbf[iG*_nB*_dim + 1*_dim + 1] = -(xi+1)/4;
-                    _dbf[iG*_nB*_dim + 2*_dim + 0] = -(eta+1)/4;   _dbf[iG*_nB*_dim + 2*_dim + 1] = -(xi-1)/4;
-                    _dbf[iG*_nB*_dim + 3*_dim + 0] = (eta+1)/4 ;   _dbf[iG*_nB*_dim + 3*_dim + 1] = (xi+1)/4 ;
+                    _dbf[iG*_nB*_dim + 2*_dim + 0] = (eta+1)/4;   _dbf[iG*_nB*_dim + 2*_dim + 1] = (xi+1)/4;
+                    _dbf[iG*_nB*_dim + 3*_dim + 0] = -(eta+1)/4 ;   _dbf[iG*_nB*_dim + 3*_dim + 1] = -(xi-1)/4 ;
                 }
                 break;
 

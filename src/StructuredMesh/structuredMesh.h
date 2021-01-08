@@ -4,6 +4,11 @@
 #define UPA_STRUCTUREDMESH_H
 
 #include <stdexcept>
+#include <vector>
+#include <queue>
+#include <utility>
+#include <iostream>
+
 #include "myMath.h"
 #include "referenceElement.h"
 
@@ -22,11 +27,25 @@ namespace upa {
         int  getNumElements() const { return _nElems; }
         int  getNumNodes() const { return _nNodes;}
         int  getNumElemNbors() const { return _nNbors;}
+        int  getNumNborElems(int e) const { return EEmap[e].size();}
         ElemType getElemType() {return _elemType;}
 
-        void getElemDOFs(int e, int *dofs);
+        void getElemNodes(int e, int *dofs);
+        void getElemNbors(int e, int *nbors);
         void getElemCoords(int e, double *dofCoords);
         void getNodeCoords(int d, double *dofCoords);
+
+        // Auxiliar functions
+
+        /** @brief Returns true if the point given by 'coords' is inside the element 'elem'
+         */
+        bool isInsideElement(int elem, double* coords);
+
+        /** @brief Fills 'coords' with the baricenter coordinates of the element 'elem'
+         */
+        void getElemBarycenter(int elem, double* coords);
+
+        int findContainingElem(double* coords, int e0 = -1);
 
     private:
         int _nElems; // Number of elements in the mesh
@@ -35,7 +54,8 @@ namespace upa {
         int _dim;    // Physical dimension
         ElemType _elemType;
 
-        int *connect;       // size [nElems,nNbors]
+        int *ENmap;       // size [nElems,nNbors]
+        std::vector<int> *EEmap;
         double *nodeCoords; // size [nNodes,dim]
 
     };
