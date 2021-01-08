@@ -54,7 +54,7 @@ int main() {
     for (int e = 0; e < nE; ++e) { // Loop in elements
         int nodes[nNbors];
         double nodeCoords[nNbors*dim];
-        mesh->getElemDOFs(e,nodes);
+        mesh->getElemNodes(e,nodes);
         mesh->getElemCoords(e,nodeCoords);
 
 
