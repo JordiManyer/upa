@@ -2,18 +2,11 @@
 #include <iostream>
 #include "sparse_LIL.h"
 #include "sparse_CSR.h"
-#include "solver_AMG.h"
+#include "iterator_Jacobi.h"
 #include "debugIO.h"
 
 using namespace std;
 using namespace upa;
-
-/*template <typename T>
-void printArray(size_t n, const T arr[]) {
-    std::cout << std::endl;
-    for (size_t i = 0; i < n; ++i) std::cout << arr[i] << " ";
-    std::cout << std::endl;
-}*/
 
 
 int main() {
@@ -47,7 +40,7 @@ int main() {
     double tol = 1.e-5;
     int maxIter = 100;
 
-    auto iterator = new Solver_AMG::Iterator_Jacobi(&csr,0.3);
+    auto iterator = new Iterator_Jacobi(&csr,0.3);
 
     double error = 10.0; int k = 0;
     while (error > tol and k < maxIter) {

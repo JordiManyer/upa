@@ -5,6 +5,7 @@
 
 #include "sparse_CSR.h"
 #include "solver.h"
+#include "iterator.h"
 
 namespace upa {
 
@@ -23,9 +24,6 @@ namespace upa {
         ~Solver_AMG() override = default;
 
         /// Subclass declaration
-        class Iterator;           // General iterator class
-        enum class Iterator_Type; // Enum Class for different iterators
-        class Iterator_Jacobi;    // Jacobi iterator
         class AMG_Level;          // Level structure for the AMG solver
 
         /// Additional setup
@@ -45,47 +43,6 @@ namespace upa {
     class Solver_AMG::AMG_Level {
     public:
     private:
-    };
-
-
-    /** General Iterator class
-     *
-     *  Each iterator has two main functions:
-     *      1) A constructor, which sets up the internal variables.
-     *      2) An iteration function, which should have no further setup required.
-     */
-    class Solver_AMG::Iterator {
-
-    public:
-        virtual ~Iterator() = default;
-        virtual void iterate(double* x_in, double* b, double* x_out) = 0;
-
-    };
-
-    /** Enum Class for different iterators **/
-    enum class Solver_AMG::Iterator_Type {
-        Jacobi
-    };
-
-    /**  Jacobi iterator for AMG
-     *   Each iteration performs the action  x <- (1-w) x + w[x + D^-1 (b - Ax)]
-     *   where
-     *      1) w is a relaxation parameter (tuneable).
-     *      2) A is the matrix system, D is its diagonal and b is the system vector.
-     */
-    class Solver_AMG::Iterator_Jacobi: public Iterator {
-
-    public:
-        Iterator_Jacobi(Sparse_CSR* problemMatrix, double relaxationParameter);
-        ~Iterator_Jacobi() override = default;
-        void iterate(double* x_in, double* b, double* x_out) override;
-
-    private:
-        int n;
-        Sparse_CSR* A;
-        double* D;
-        double w;
-
     };
 
 
