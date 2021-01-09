@@ -1,22 +1,25 @@
 
+
 #include <iostream>
 #include "sparse_LIL.h"
 #include "sparse_CSR.h"
-#include "solver_CG.h"
+#include "solver_PCG.h"
+#include "preconditioner_diag.h"
+#include "debugIO.h"
 
 using namespace std;
 using namespace upa;
 
 
 int main() {
-    int n = 10;
+    int n = 5;
     Sparse_LIL lil(n);
 
     ///  Assembling the matrix in LIL format
     for (int i = 0; i < n; ++i) {
-        lil.put(i,i,2.0);
-        if (i != 0  ) lil.put(i,i-1,-1.0);
-        if (i != n-1) lil.put(i,i+1,-1.0);
+        lil.put(i,i,2.0/n);
+        if (i != 0  ) lil.put(i,i-1,-1.0/n);
+        if (i != n-1) lil.put(i,i+1,-1.0/n);
     }
 
     /// Convert to CSR
@@ -38,23 +41,22 @@ int main() {
     }
 
     // Solve system
-    Solver_CG CG(n, &csr, b);
-    CG.setTolerance(0.000001);
-    CG.setVerbosity(1);
-    CG.solve(x0);
+    Preconditioner_Diag P(&csr);
 
-    CG.getSolution(x);
-    CG.getResidual(r);
+    Solver_PCG PCG(n, &csr, b, &P);
+    PCG.setTolerance(0.000001);
+    PCG.setVerbosity(1);
+    PCG.solve(x0);
+
+    PCG.getSolution(x);
+    PCG.getResidual(r);
 
     // Output
-    cout << "Converged : " << CG.getConvergence() << endl;
-    cout << "Number of iterations: " << CG.getNumIter() << endl;
-    cout << "Error2 : " << CG.getError() << endl;
+    cout << "Converged : " << PCG.getConvergence() << endl;
+    cout << "Number of iterations: " << PCG.getNumIter() << endl;
+    cout << "Error2 : " << PCG.getError() << endl;
 
     cout << "x = " << endl;
-    for (int i = 0; i < n; ++i) {
-        cout << x[i] << " , ";
-    }
-    cout << endl;
+    printArray(n,x);
 
 }
