@@ -8,13 +8,6 @@
 using namespace std;
 using namespace upa;
 
-/*template <typename T>
-void printArray(size_t n, const T arr[]) {
-    std::cout << std::endl;
-    for (size_t i = 0; i < n; ++i) std::cout << arr[i] << " ";
-    std::cout << std::endl;
-}*/
-
 
 int main() {
     int n = 3;
