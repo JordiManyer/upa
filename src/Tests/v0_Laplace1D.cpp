@@ -18,7 +18,7 @@ int main() {
     ElemType type = ElemType::Line;
 
     auto* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,12,type);
+    mesh->produceCartesian(dim,11,type);
 
     auto* refElem = new ReferenceElement(type,BFType::Lagrangian,1);
 

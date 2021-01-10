@@ -1,7 +1,7 @@
 
 
-#ifndef LINEARSOLVERS_LINEARSOLVERS_H
-#define LINEARSOLVERS_LINEARSOLVERS_H
+#ifndef UPA_DENSESOLVERS_H
+#define UPA_DENSESOLVERS_H
 
 #include <cmath>
 
@@ -13,4 +13,4 @@ void solveLU(int n, double* LU , int* P , double* b, double* x);
 void Chol(int n, double* M, double* L);
 void solveChol(int n, double* L, double* b, double* x);
 
-#endif //LINEARSOLVERS_LINEARSOLVERS_H
+#endif //UPA_DENSESOLVERS_H

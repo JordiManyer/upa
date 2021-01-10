@@ -27,7 +27,7 @@ namespace upa {
 
         // Set default parameters
         tol = 1.e-12;
-        maxIter = n * n;
+        maxIter = 2 * n;
         verbose = 0;
     }
 
