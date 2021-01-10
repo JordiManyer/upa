@@ -1,7 +1,7 @@
 
 
 #include <iostream>
-#include "directSolvers.h"
+#include "denseSolvers.h"
 
 /***********************************************************************
  **************  LU DECOMPOSITION WITH PARTIAL PIVOTING  ***************
