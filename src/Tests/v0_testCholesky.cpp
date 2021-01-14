@@ -4,6 +4,7 @@
 #include "sparse_CSR.h"
 #include "directSolver_Cholesky.h"
 #include "debugIO.h"
+#include "denseSolvers.h"
 
 using namespace std;
 using namespace upa;
@@ -52,6 +53,40 @@ int main() {
 
     auto chol = new DirectSolver_Cholesky(n,&csr,b);
 
+    cout << "parent = " << endl;
     printArray(n,chol->parent);
+    cout << "postorder = " << endl;
+    printArray(n,chol->postorder);
+    cout << "postorder_inv = " << endl;
+    printArray(n,chol->postorder_inv);
+    cout << "leaves = " << endl;
+    for (int i = 0; i < n; ++i) {
+        if (chol->leaves[i].size() == 0) cout << " Empty ";
+        for (auto j: chol->leaves[i]) cout << j << "  ";
+        cout << endl;
+    }
+    cout << endl;
+
+    cout << "nnz counts: " << endl;
+    printArray(n+1,chol->rows);
+
+    cout << "L skeleton: " << endl;
+    for (int i = 0; i < n; ++i) {
+        for (int j = chol->rows[i]; j < chol->rows[i+1]; ++j) cout << "   " << chol->cols[j];
+    cout << endl;
+    }
+    cout << endl;
+
+
+    // Check with dense solver:
+    double denseMat[n*n], denseL[n*n];
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            denseMat[i*n+j] = lil(i,j);
+        }
+    }
+    Chol(n,denseMat,denseL);
+    printMatrix(n,n,denseL);
+
 
 }
