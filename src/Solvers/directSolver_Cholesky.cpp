@@ -20,9 +20,9 @@ namespace upa {
         descendants = new std::vector<int>[n];
         for (int i = n-2; i >= 0; --i) descendants[parent[i]].push_back(i);
 
-        // Find a postorder ordering for the elimination tree
-        postorder = new int[n];
-        postorder_inv = new int[n];
+        // Find a post2pre ordering for the elimination tree
+        post2pre = new int[n];
+        pre2post = new int[n];
         _postOrder();
 
         // Create skeleton graph
@@ -30,7 +30,10 @@ namespace upa {
         _findLeaves();
 
         // Creates the structure for L
-        _symbolicFactorization();
+        _findSkeleton();
+
+        // Fill the cholesky matrix L
+        _factorize();
 
     }
 
@@ -73,50 +76,49 @@ namespace upa {
             k = s.top();
             s.pop();
             for (int & i : descendants[k]) s.push(i);
-            postorder[pos] = k;
-            postorder_inv[k] = pos;
+            post2pre[pos] = k;
+            pre2post[k] = pos;
             --pos;
         }
     }
 
 
     void DirectSolver_Cholesky::_findLeaves() {
-        // Find neighbors and order in postorder
+        // Find neighbors and order in post2pre
         for (int i = 0; i < n; ++i) {
             std::vector<int> neighbors;
-            for (int j = A->rows[postorder[i]]; j < A->rows[postorder[i]+1]; ++j) {
-                if(postorder_inv[A->cols[j]] < i) neighbors.push_back(postorder_inv[A->cols[j]]);
+            for (int j = A->rows[post2pre[i]]; j < A->rows[post2pre[i]+1]; ++j) {
+                if(pre2post[A->cols[j]] < i) neighbors.push_back(pre2post[A->cols[j]]);
             }
             sort(neighbors.begin(), neighbors.end());
 
             // Select direct ancestors using Corollary 4.3 in [Liu,1986].
             for (int j = 0; j < neighbors.size(); ++j) {
-                if (j == 0 or neighbors[j-1] < neighbors[j] - descendants[postorder[neighbors[j]]].size()) leaves[i].push_back(neighbors[j]);
+                if (j == 0 or neighbors[j-1] < neighbors[j] - descendants[post2pre[neighbors[j]]].size()) leaves[i].push_back(neighbors[j]);
             }
         }
     }
 
 
-    void DirectSolver_Cholesky::_symbolicFactorization() {
-        int i_real, d, dNext, k;
+    void DirectSolver_Cholesky::_findSkeleton() {
+        int d, dNext, k;
 
         // First traverse of the elimination tree: Count nonzero entries of L
         nnz = 0;
         rows = new int [n+1]; rows[0] = 0;
-        for (int i_post = 0; i_post < n; ++i_post) {
-            i_real = postorder[i_post];
-            rows[i_real+1] = 0;
+        for (int i = 0; i < n; ++i) {
+            rows[i+1] = 0;
 
-            for (auto ptr = leaves[i_real].begin(); ptr != leaves[i_real].end(); ++ptr) {
+            for (auto ptr = leaves[i].begin(); ptr != leaves[i].end(); ++ptr) {
                 d = *ptr;
 
-                if (std::next(ptr,1) != leaves[i_real].end()) dNext = *std::next(ptr,1);
-                else dNext = i_post;
+                if (std::next(ptr,1) != leaves[i].end()) dNext = *std::next(ptr,1);
+                else dNext = i;
 
                 while (d < dNext) {
-                    rows[i_real+1]++;
+                    rows[i+1]++;
                     nnz++;
-                    d = postorder[parent[d]];
+                    d = pre2post[parent[post2pre[d]]];
                 }
             }
         }
@@ -127,23 +129,26 @@ namespace upa {
         values = new double[nnz];
 
         // Second traverse of the elimination tree: find nonzero indexes of L
-        for (int i_post = 0; i_post < n; ++i_post) {
-            i_real = postorder[i_post];
-            k = rows[i_real];
+        for (int i = 0; i < n; ++i) {
+            k = rows[i];
 
-            for (auto ptr = leaves[i_real].begin(); ptr != leaves[i_real].end(); ++ptr) {
+            for (auto ptr = leaves[i].begin(); ptr != leaves[i].end(); ++ptr) {
                 d = *ptr;
 
-                if (std::next(ptr,1) != leaves[i_real].end()) dNext = *std::next(ptr,1);
-                else dNext = i_post;
+                if (std::next(ptr,1) != leaves[i].end()) dNext = *std::next(ptr,1);
+                else dNext = i;
 
                 while (d < dNext) {
                     cols[k] = d;
                     k++;
-                    d = postorder[parent[d]];
+                    d = pre2post[parent[post2pre[d]]];
                 }
             }
         }
+    }
+
+
+    void DirectSolver_Cholesky::_factorize() {
 
     }
 

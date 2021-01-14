@@ -19,8 +19,8 @@ namespace upa {
         // Elimination tree
         int *parent;
         std::vector<int>* descendants;
-        int *postorder;
-        int *postorder_inv;
+        int *post2pre;
+        int *pre2post;
 
         // Skeleton Graph
         std::vector<int> *leaves;
@@ -42,7 +42,7 @@ namespace upa {
          */
         void _getEliminationTree();
 
-        /** @brief Generates a postorder ordering of the elimination tree.
+        /** @brief Generates a post2pre ordering of the elimination tree.
          *
          *  Uses a DFS-like algorithm to avoid recursion.
          *  See [Aho, Data Structures and Algorithms] and [Duff,1983].
@@ -58,7 +58,7 @@ namespace upa {
         /** @brief Creates sparsity pattern of the Cholesky matrix L
          *
          */
-        void _symbolicFactorization();
+        void _findSkeleton();
 
         void _factorize();
 

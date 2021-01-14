@@ -55,10 +55,10 @@ int main() {
 
     cout << "parent = " << endl;
     printArray(n,chol->parent);
-    cout << "postorder = " << endl;
-    printArray(n,chol->postorder);
-    cout << "postorder_inv = " << endl;
-    printArray(n,chol->postorder_inv);
+    cout << "post2pre = " << endl;
+    printArray(n,chol->post2pre);
+    cout << "pre2post = " << endl;
+    printArray(n,chol->pre2post);
     cout << "leaves = " << endl;
     for (int i = 0; i < n; ++i) {
         if (chol->leaves[i].size() == 0) cout << " Empty ";
