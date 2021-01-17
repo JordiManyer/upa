@@ -8,12 +8,28 @@
 
 namespace upa {
 
+    /* Element types. Parenthesis -> Node IDs; Brackets -> Node coordinates
+     *
+     *   -Line:
+     *          (0) ------ (1)
+     *          [-1]        [1]
+     *
+     *   -Square (equivalent to Line x Line):
+     *        [-1,1]      [1,1]
+     *          (3) ------ (2)
+     *           |          |
+     *           |          |
+     *          (0) ------ (1)
+     *        [-1,-1]     [1,-1]
+     *
+     */
     enum class ElemType {
         Line, Square
     };
 
+    // Basis function types
     enum class BFType {
-        Lagrangian
+        Lagrangian // Polynomial basis such that Ni(xj) = delta_ij
     };
 
 
@@ -47,6 +63,12 @@ namespace upa {
         double* _bf;  // Basis functions evaluated at the gauss points
         double* _dbf; // Derivatives of the basis functions evaluated at the gauss points
 
+        /** @brief Fills the ReferenceElement object with all needed information
+         *
+         * @tparam etype  - Element type
+         * @tparam bftype - Basis function type
+         * @param bforder - Element order
+         */
         template<ElemType etype, BFType bftype>
         void _fillRefElem(int bforder);
 

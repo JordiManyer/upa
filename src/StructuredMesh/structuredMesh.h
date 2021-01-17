@@ -45,13 +45,15 @@ namespace upa {
          */
         void getElemBarycenter(int elem, double* coords);
 
+        /** @brief Returns the element ID containing the point 'coords'
+         */
         int findContainingElem(double* coords, int e0 = -1);
 
     private:
         int _nElems; // Number of elements in the mesh
         int _nNodes; // Number of nodes in the mesh
         int _nNbors; // Number of neighboring nodes per element
-        int _dim;    // Physical dimension
+        int _dim;    // Physical dimension (1D, 2D, 3D, ...)
         ElemType _elemType;
 
         int *ENmap;       // size [nElems,nNbors]
