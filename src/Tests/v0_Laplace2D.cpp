@@ -20,7 +20,7 @@ int main() {
     StructuredMesh* mesh = new StructuredMesh();
     mesh->produceCartesian(dim,3,type);
 
-    ReferenceElement* refElem = new ReferenceElement(type,BFType::Lagrangian,1);
+    ReferenceElement* refElem = getReferenceElement(type,BFType::Lagrangian,1);
 
 
     int nE = mesh->getNumElements();
