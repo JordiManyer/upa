@@ -22,7 +22,7 @@ namespace upa {
      *
      */
     enum class ElemType {
-        Line, Square
+        Line, Square, Triangle
     };
 
     /***************     BASIS TYPES     ********************/
