@@ -53,6 +53,28 @@ namespace upa {
 
     };
 
+    template<>
+    class RefElem<ElemType::Triangle, BFType::Lagrangian, 1> : public ReferenceElement {
+    public:
+        RefElem();
+        ~RefElem() override = default;
+
+        void evaluateBFs(const double* coords, double *bf) override;
+        void evaluateDBFs(const double* coords, double *dbf) override;
+
+    };
+
+
+    template<>
+    class RefElem<ElemType::Triangle, BFType::Lagrangian, 2> : public ReferenceElement {
+    public:
+        RefElem();
+        ~RefElem() override = default;
+
+        void evaluateBFs(const double* coords, double *bf) override;
+        void evaluateDBFs(const double* coords, double *dbf) override;
+
+    };
 
 
 }

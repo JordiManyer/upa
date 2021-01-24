@@ -21,6 +21,13 @@ namespace upa {
             } else if ( bftype == BFType::Nedelec) {
 
             }
+        } else if (etype == ElemType::Triangle) {
+            if ( bftype == BFType::Lagrangian) {
+                if (bforder == 1) return new RefElem<ElemType::Triangle,BFType::Lagrangian,1>();
+                if (bforder == 2) return new RefElem<ElemType::Triangle,BFType::Lagrangian,2>();
+            } else if ( bftype == BFType::Nedelec) {
+
+            }
         }
         throw std::runtime_error("getReferenceElement: Element not implemented!");
         return nullptr;

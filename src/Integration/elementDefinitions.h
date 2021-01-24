@@ -8,17 +8,26 @@ namespace upa {
     /***************    ELEMENT TYPES    ********************
      * Parenthesis -> Node IDs; Brackets -> Node coordinates
      *
-     *   -Line:
+     *   - Line:
      *          (0) ------ (1)
      *          [-1]        [1]
      *
-     *   -Square (equivalent to Line x Line):
+     *   - Square (equivalent to Line x Line):
      *        [-1,1]      [1,1]
      *          (3) ------ (2)
      *           |          |
      *           |          |
      *          (0) ------ (1)
      *        [-1,-1]     [1,-1]
+     *
+     *   - Triangle
+     *        [0,1]
+     *         (2)
+     *          |   .
+     *          |     .
+     *          |        .
+     *         (0) ------ (1)
+     *        [0,0]      [1,0]
      *
      */
     enum class ElemType {

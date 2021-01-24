@@ -245,6 +245,149 @@ namespace upa {
         dbf[16] = (coords[0]+1.0/2.0) * (coords[1]*(coords[1]+1.0)/2.0);   dbf[17] = (coords[0]*(coords[0]+1.0)/2.0) * (coords[1]+1.0/2.0);
     }
 
+    ///**************************************************************************************************************///
+    ///**************************************************************************************************************///
+
+    /**  First order Lagrangian triangle:
+     *
+     *           N2                             N0 = 1-xi-eta
+     *          [0,1]                           N1 = xi
+     *            |   .                         N2 = eta
+     *            |      .
+     *            |         .
+     *            |            .
+     *          [0,0] -------- [1,0]
+     *           N0              N1
+     */
+
+    RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::RefElem() {
+        _dim      = 2;
+        _nB       = 3;
+        _bforder  = 1;
+        _elemType = ElemType::Square;
+        _bftype   = BFType::Lagrangian;
+
+        _nG  = 3;
+        _gW  = new double[_nG];
+        _gC  = new double[_nG*_dim];
+        _bf  = new double[_nG*_nB];
+        _dbf = new double[_nG*_nB*_dim];
+
+        // Quadratures from https://arxiv.org/abs/math/0501496
+        //       w_i             x_i                y_i
+        _gW[0] = 2.0/3.0; _gC[0] = 1.0/6.0; _gC[1] = 2.0/3.0;
+        _gW[1] = 2.0/3.0; _gC[2] = 2.0/3.0; _gC[3] = 1.0/6.0;
+        _gW[2] = 2.0/3.0; _gC[4] = 1.0/6.0; _gC[5] = 1.0/6.0;
+
+        double xi,eta;
+        for (int iG = 0; iG < _nG; ++iG) {
+            xi = _gC[iG*_dim+0]; eta = _gC[iG*_dim+1];
+
+            _bf[iG*_nB + 0] = 1.0 - xi -eta;
+            _bf[iG*_nB + 1] = xi;
+            _bf[iG*_nB + 2] = eta;
+
+            // dbf/dxi; dbf/deta
+            _dbf[iG*_nB*_dim + 0*_dim + 0] = -1.0;  _dbf[iG*_nB*_dim + 0*_dim + 1] = 1.0;
+            _dbf[iG*_nB*_dim + 1*_dim + 0] = 1.0;   _dbf[iG*_nB*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_dim + 2*_dim + 0] = 0.0;   _dbf[iG*_nB*_dim + 2*_dim + 1] = 1.0;
+
+        }
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::evaluateBFs(const double *coords, double *bf) {
+        bf[0] = 1.0 - coords[0] - coords[1];
+        bf[1] = coords[0];
+        bf[2] = coords[1];
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::evaluateDBFs(const double *coords, double *dbf) {
+        dbf[0] = -1.0  ; dbf[1] = -1.0 ;
+        dbf[2] =  1.0  ; dbf[3] =  0.0 ;
+        dbf[4] =  0.0  ; dbf[5] =  1.0 ;
+    }
+
+
+    ///**************************************************************************************************************///
+    ///**************************************************************************************************************///
+
+    /**  Second order Lagrangian triangle:
+     *
+     *           N2                                  N0 = (1-xi-eta)(1-2 xi-2 eta)
+     *          [0,1]                                N1 = xi (2 xi-1)
+     *            |    .                             N2 = eta (2 eta-1)
+     *            |        .                         N3 = 4 xi (1-xi-eta)
+     *     N5  [0,1/2]     [1/2,1/2]   N4            N4 = 4 xi eta
+     *            |              .                   N5 = 4 xi (1-xi-eta)
+     *            |                  .
+     *          [0,0] ---- [1/2,0] ---- [1,0]
+     *           N0          N3           N1
+     */
+
+    RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::RefElem() {
+        _dim      = 2;
+        _nB       = 9;
+        _bforder  = 2;
+        _elemType = ElemType::Square;
+        _bftype   = BFType::Lagrangian;
+
+        _nG  = 9;
+        _gW  = new double[_nG];
+        _gC  = new double[_nG*_dim];
+        _bf  = new double[_nG*_nB];
+        _dbf = new double[_nG*_nB*_dim];
+
+        // Quadratures from https://arxiv.org/abs/math/0501496
+        //       w_i                        x_i                         y_i
+        _gW[0] = 0.2199034873106; _gC[0]  = 0.0915762135098; _gC[1]  = 0.0915762135098;
+        _gW[1] = 0.2199034873106; _gC[2]  = 0.8168475729805; _gC[3]  = 0.0915762135098;
+        _gW[2] = 0.2199034873106; _gC[4]  = 0.0915762135098; _gC[5]  = 0.8168475729805;
+        _gW[3] = 0.4467631793560; _gC[6]  = 0.1081030181681; _gC[7]  = 0.4459484909160;
+        _gW[4] = 0.4467631793560; _gC[8]  = 0.4459484909160; _gC[9]  = 0.1081030181681;
+        _gW[5] = 0.4467631793560; _gC[10] = 0.4459484909160; _gC[11] = 0.4459484909160;
+
+        double xi,eta;
+        for (int iG = 0; iG < _nG; ++iG) {
+            xi = _gC[iG*_dim+0]; eta = _gC[iG*_dim+1];
+
+            _bf[iG*_nB + 0] = (1.0-xi-eta) * (1-2.0*xi-2.0*eta);
+            _bf[iG*_nB + 1] = xi*(2.0*xi-1.0);
+            _bf[iG*_nB + 2] = eta*(2.0*xi-1.0);
+            _bf[iG*_nB + 3] = 4.0*xi*(1.0-xi-eta);
+            _bf[iG*_nB + 4] = 4.0*xi*eta;
+            _bf[iG*_nB + 5] = 4.0*xi*(1.0-xi-eta);
+            
+            // dbf/dxi; dbf/deta
+            _dbf[iG*_nB*_dim + 0*_dim + 0] = -3.0 + 4.0*xi + 4.0*eta;  _dbf[iG*_nB*_dim + 0*_dim + 1] = -3.0 + 4.0*xi + 4.0*eta;
+            _dbf[iG*_nB*_dim + 1*_dim + 0] = 4.0*xi - 1.0;             _dbf[iG*_nB*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_dim + 2*_dim + 0] = 2.0*eta;                  _dbf[iG*_nB*_dim + 2*_dim + 1] = 2.0*xi - 1.0;
+
+            _dbf[iG*_nB*_dim + 0*_dim + 0] = 4.0 - 8.0*xi - 4.0*eta ;  _dbf[iG*_nB*_dim + 0*_dim + 1] = -4.0*xi;
+            _dbf[iG*_nB*_dim + 1*_dim + 0] = 4.0*eta;                  _dbf[iG*_nB*_dim + 1*_dim + 1] = 4.0*xi;
+            _dbf[iG*_nB*_dim + 2*_dim + 0] = 4.0 - 8.0*xi - 4.0*eta;   _dbf[iG*_nB*_dim + 2*_dim + 1] = -4.0*xi;
+            
+        }
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::evaluateBFs(const double *coords, double *bf) {
+        bf[0] = (1.0-coords[0]-coords[1]) * (1-2.0*coords[0]-2.0*coords[1]);
+        bf[1] = coords[0]*(2.0*coords[0]-1.0);
+        bf[2] = coords[1]*(2.0*coords[0]-1.0);
+        bf[3] = 4.0*coords[0]*(1.0-coords[0]-coords[1]);
+        bf[4] = 4.0*coords[0]*coords[1];
+        bf[5] = 4.0*coords[0]*(1.0-coords[0]-coords[1]);
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::evaluateDBFs(const double *coords, double *dbf) {
+        // dN/dxi; dN/deta
+        dbf[0] = -3.0 + 4.0*coords[0] + 4.0*coords[1];  dbf[1] = -3.0 + 4.0*coords[0] + 4.0*coords[1];
+        dbf[2] = 4.0*coords[0] - 1.0;                   dbf[3] = 0.0;
+        dbf[4] = 2.0*coords[1];                         dbf[5] = 2.0*coords[0] - 1.0;
+
+        dbf[6]  = 4.0 - 8.0*coords[0] - 4.0*coords[1] ; dbf[7]  = -4.0*coords[0];
+        dbf[8]  = 4.0*coords[1];                        dbf[9]  = 4.0*coords[0];
+        dbf[10] = 4.0 - 8.0*coords[0] - 4.0*coords[1];  dbf[11] = -4.0*coords[0];
+    }
 
     ///**************************************************************************************************************///
     ///**************************************************************************************************************///
