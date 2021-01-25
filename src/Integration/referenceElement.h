@@ -45,6 +45,7 @@ namespace upa {
         double* _gC;  // Gauss points coordinates
         double* _bf;  // Basis functions evaluated at the gauss points
         double* _dbf; // Derivatives of the basis functions evaluated at the gauss points
+        double* _curlbf; // Curl of the basis functions
     };
 
 
