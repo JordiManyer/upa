@@ -30,11 +30,10 @@ namespace upa {
 
     void StructuredMesh::produceCartesian(int dim, int nSide, ElemType type) {
         _dim = dim;
-        _nElems = ipow(nSide,dim);
-        _nNodes = ipow(nSide+1,dim);
         _elemType = type;
 
         // Calculate node coordinates
+        _nNodes = ipow(nSide+1,dim);
         nodeCoords = new double[_nNodes*_dim];
         int iSide[_dim]; for (int i = 0; i < _dim; ++i) iSide[i] = 0;
         for (int i = 0; i < _nNodes; ++i) {
@@ -52,6 +51,7 @@ namespace upa {
         switch (_elemType) {
             case ElemType::Line:
                 if (dim != 1) throw std::runtime_error("StructuredMesh: ElemType::Line needs dim = 1");
+                _nElems = ipow(nSide,dim);
                 _nNbors = 2;
                 ENmap = new int[_nElems*_nNbors];
                 EEmap = new std::vector<int>[_nElems];
@@ -68,6 +68,7 @@ namespace upa {
 
             case ElemType::Square:
                 if (dim != 2) throw std::runtime_error("StructuredMesh: ElemType::Square needs dim = 2");
+                _nElems = ipow(nSide,dim);
                 _nNbors = 4;
                 ENmap = new int[_nElems*_nNbors];
                 EEmap = new std::vector<int>[_nElems];
@@ -84,6 +85,35 @@ namespace upa {
                         if (i != nSide-1) EEmap[i*nSide+j].push_back((i+1)*nSide + j);
                         if (j != 0)       EEmap[i*nSide+j].push_back(i*nSide + j-1);
                         if (j != nSide-1) EEmap[i*nSide+j].push_back(i*nSide + j+1);
+                    }
+                }
+                break;
+
+            case ElemType::Triangle:
+                if (dim != 2) throw std::runtime_error("StructuredMesh: ElemType::Square needs dim = 2");
+                _nElems = 2*ipow(nSide,dim);
+                _nNbors = 3;
+                ENmap = new int[_nElems*_nNbors];
+                EEmap = new std::vector<int>[_nElems];
+
+                for (int i = 0; i < _nElems/2; ++i) { // For each square, we do bottom triangle then top triangle
+                    ENmap[(2*i) * _nNbors + 0] = i + i/nSide;
+                    ENmap[(2*i) * _nNbors + 1] = i + 1 + i/nSide;
+                    ENmap[(2*i) * _nNbors + 2] = i + nSide + 1 + i/nSide;
+
+                    ENmap[(2*i+1) * _nNbors + 0] = i + nSide + 2 + i/nSide;
+                    ENmap[(2*i+1) * _nNbors + 1] = i + nSide + 1 + i/nSide;
+                    ENmap[(2*i+1) * _nNbors + 2] = i + 1 + i/nSide;
+                }
+                for (int i = 0; i < nSide; ++i) { // For each square, we do bottom triangle then top triangle
+                    for (int j = 0; j < nSide; ++j) {
+                        if (i != 0)       EEmap[i*2*nSide+2*j].push_back((i-1)*2*nSide+2*j+1);
+                        if (j != 0)       EEmap[i*2*nSide+2*j].push_back(i*2*nSide+2*j-1);
+                        EEmap[i*2*nSide+2*j].push_back(i*2*nSide+2*j+1);
+
+                        EEmap[i*2*nSide+2*j+1].push_back(i*2*nSide+2*j);
+                        if (j != nSide-1) EEmap[i*2*nSide+2*j+1].push_back(i*2*nSide+2*j+2);
+                        if (i != nSide-1) EEmap[i*2*nSide+2*j+1].push_back((i+1)*2*nSide+2*j);
                     }
                 }
                 break;
@@ -111,10 +141,7 @@ namespace upa {
             for (int j = 0; j < _nNbors; ++j) {
                 for (int i = 0; i < _dim; ++i) x1[i] = nodeCoords[nodes[j]*_dim+i] - coords[i];
                 a1 = x2[0] * x1[1] - x1[0] * x2[1];
-/*                std::cout << elem << " " << a1 << std::endl;
-                std::cout << nodeCoords[nodes[j]*_dim+0] << "," << nodeCoords[nodes[j]*_dim+1] << std::endl;
-                std::cout << x1[0] << "," << x1[1] << std::endl;
-                std::cout << x2[0] << "," << x2[1] << std::endl << std::endl;*/
+
                 if (j != 0 and a1 * a2 < 0.0) return false;
                 for (int i = 0; i < _dim; ++i) x2[i] = x1[i]; a2 = a1;
             }
