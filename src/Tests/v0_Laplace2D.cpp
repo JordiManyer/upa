@@ -15,12 +15,12 @@ int main() {
     double source = 1.0;
 
     int dim = 2;
-    ElemType type = ElemType::Square;
+    ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,3,type);
+    mesh->produceCartesian(dim,2,type);
 
-    ReferenceElement* refElem = new ReferenceElement(type,BFType::Lagrangian,1);
+    ReferenceElement* refElem = getReferenceElement(type,BFType::Lagrangian,1);
 
 
     int nE = mesh->getNumElements();
@@ -50,6 +50,7 @@ int main() {
 
     auto sysK = new Sparse_LIL(nN+nBoundary);
     double sysF[nN+nBoundary]; for(int i = 0; i < nN+nBoundary; ++i) sysF[i] = 0.0;
+    double Area = 0.0;
 
     for (int e = 0; e < nE; ++e) { // Loop in elements
         int nodes[nNbors];
@@ -57,6 +58,12 @@ int main() {
         mesh->getElemNodes(e,nodes);
         mesh->getElemCoords(e,nodeCoords);
 
+        double Ke[nNbors*nNbors];
+        double fe[nNbors];
+        for (int i = 0; i < nNbors; ++i) {
+            for (int j = 0; j < nNbors; ++j) Ke[i*nNbors+j] = 0.0;
+            fe[i] = 0.0;
+        }
 
         for (int k = 0; k < nG; ++k) { // Loop in Gauss Points
 
@@ -88,15 +95,9 @@ int main() {
             }
 
             double dV = wk * det(dim, J);
+            Area += dV;
 
             /// Integration
-            double Ke[nNbors*nNbors];
-            double fe[nNbors];
-            for (int i = 0; i < nNbors; ++i) {
-                for (int j = 0; j < nNbors; ++j) Ke[i*nNbors+j] = 0.0;
-                fe[i] = 0.0;
-            }
-
             // Elemental matrix
             for (int i = 0; i < nNbors; ++i) {
                 for (int j = 0; j < nNbors; ++j) {
@@ -109,13 +110,14 @@ int main() {
                 if (boundaryNew[nodes[i]]) fe[i] += bfk[i] * 1.0 * dV;
             }
 
-            /// Assemble
-            for (int i = 0; i < nNbors; ++i) {
-                for (int j = 0; j < nNbors; ++j) {
-                    sysK->assemble(nodes[i], nodes[j], Ke[i*nNbors+j]);
-                }
-                sysF[nodes[i]] += fe[i];
+        }
+
+        /// Assemble
+        for (int i = 0; i < nNbors; ++i) {
+            for (int j = 0; j < nNbors; ++j) {
+                sysK->assemble(nodes[i], nodes[j], Ke[i*nNbors+j]);
             }
+            sysF[nodes[i]] += fe[i];
         }
     }
 
@@ -153,13 +155,14 @@ int main() {
     cout << endl;
 
     cout << "Complete vector: " << endl;
-    for (int i = 0; i < nN; ++i) {
+    for (int i = 0; i < nN+nBoundary; ++i) {
         cout << "    " << sysF[i];
     }
     cout << endl;
 
     // Create solver
-    auto CG = new Solver_CG(nN,sysK_solve,sysF);
+    auto CG = new Solver_CG(nN+nBoundary,sysK_solve,sysF);
+    CG->setIterations(1000);
     CG->setTolerance(0.000001);
     CG->setVerbosity(1);
 

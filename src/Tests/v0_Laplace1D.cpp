@@ -5,6 +5,7 @@
 #include "sparse_CSR.h"
 #include "referenceElement.h"
 #include "solver_CG.h"
+#include "debugIO.h"
 
 using namespace std;
 using namespace upa;
@@ -31,7 +32,7 @@ int main() {
     /// Creation of the mesh and the reference element
     auto* mesh = new StructuredMesh();
     mesh->produceCartesian(dim,nElems,etype);
-    auto* refElem = new ReferenceElement(etype,bftype,1);
+    auto* refElem = getReferenceElement(etype,bftype,bforder);
 
     /// Get information from the mesh and the reference element (not necessary, here for clarity)
     int nE = mesh->getNumElements();                    // Number of elements in the mesh

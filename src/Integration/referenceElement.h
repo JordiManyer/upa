@@ -5,42 +5,21 @@
 
 #include <stdexcept>
 #include <cmath>
+#include "elementDefinitions.h"
 
 namespace upa {
 
-    /* Element types. Parenthesis -> Node IDs; Brackets -> Node coordinates
-     *
-     *   -Line:
-     *          (0) ------ (1)
-     *          [-1]        [1]
-     *
-     *   -Square (equivalent to Line x Line):
-     *        [-1,1]      [1,1]
-     *          (3) ------ (2)
-     *           |          |
-     *           |          |
-     *          (0) ------ (1)
-     *        [-1,-1]     [1,-1]
-     *
+
+    /** @brief Reference Element base class, specialised to obtain different types of elements
      */
-    enum class ElemType {
-        Line, Square
-    };
-
-    // Basis function types
-    enum class BFType {
-        Lagrangian // Polynomial basis such that Ni(xj) = delta_ij
-    };
-
-
     class ReferenceElement {
 
     public:
-        ReferenceElement(ElemType etype, BFType bftype, int bforder);
-        ~ReferenceElement() = default;
+        ReferenceElement() = default;
+        virtual ~ReferenceElement() = default;
 
         // Getters
-        int     getNumGaussPoints() {return _nG;}
+        int     getNumGaussPoints() const {return _nG;}
         double* getGaussWeights() {return _gW;}
         double* getGaussCoords() {return _gC;}
         double* getBasisFunctions(int order) {
@@ -49,8 +28,12 @@ namespace upa {
             else return nullptr;
         }
 
+        // Evaluate the basis functions within the reference element (using reference coordinates).
+        void evaluate(int degree, const double* coords, double *values);
+        virtual void evaluateBFs(const double* coords, double *bf) = 0;
+        virtual void evaluateDBFs(const double* coords, double *dbf) = 0;
 
-    private:
+    protected:
         int _dim;
         int _bforder;
         ElemType _elemType;
@@ -62,26 +45,31 @@ namespace upa {
         double* _gC;  // Gauss points coordinates
         double* _bf;  // Basis functions evaluated at the gauss points
         double* _dbf; // Derivatives of the basis functions evaluated at the gauss points
-
-        /** @brief Fills the ReferenceElement object with all needed information
-         *
-         * @tparam etype  - Element type
-         * @tparam bftype - Basis function type
-         * @param bforder - Element order
-         */
-        template<ElemType etype, BFType bftype>
-        void _fillRefElem(int bforder);
-
     };
 
 
+    /** @brief Templated class, derived from base class.
+     *         Template specialisations will create different elements.
+     */
+    template<ElemType etype, BFType bftype, int>
+    class RefElem : public ReferenceElement {
+    public:
+        RefElem() = default;
+        ~RefElem() override = default;
 
-    // Specialisations of _fillRefElem
-    template <>
-    void ReferenceElement::_fillRefElem<ElemType::Line, BFType::Lagrangian>(int bforder);
+        void evaluateBFs(const double* coords, double *bf) override = 0;
+        void evaluateDBFs(const double* coords, double *dbf) override = 0;
+    };
 
-    template <>
-    void ReferenceElement::_fillRefElem<ElemType::Square, BFType::Lagrangian>(int bforder);
+
+    /** @brief Factory method for reference elements.
+     *         Takes element parameters and returns corresponding element as a pointer to the base class.
+     *
+     * @param eType    Element type
+     * @param BFType   Basis function type
+     * @param BFOrder  Basis function order
+     */
+    ReferenceElement* getReferenceElement(ElemType eType, BFType BFType, int BFOrder);
 
 }
 
