@@ -288,7 +288,7 @@ namespace upa {
             _bf[iG*_nB + 2] = eta;
 
             // dbf/dxi; dbf/deta
-            _dbf[iG*_nB*_dim + 0*_dim + 0] = -1.0;  _dbf[iG*_nB*_dim + 0*_dim + 1] = 1.0;
+            _dbf[iG*_nB*_dim + 0*_dim + 0] = -1.0;  _dbf[iG*_nB*_dim + 0*_dim + 1] = -1.0;
             _dbf[iG*_nB*_dim + 1*_dim + 0] = 1.0;   _dbf[iG*_nB*_dim + 1*_dim + 1] = 0.0;
             _dbf[iG*_nB*_dim + 2*_dim + 0] = 0.0;   _dbf[iG*_nB*_dim + 2*_dim + 1] = 1.0;
 
