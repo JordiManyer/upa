@@ -27,6 +27,7 @@ namespace upa {
             if (order == 1) return _dbf;
             else return nullptr;
         }
+        double* getCurlBF() {return _curlbf;}
 
         // Evaluate the basis functions within the reference element (using reference coordinates).
         void evaluate(int degree, const double* coords, double *values);
