@@ -27,6 +27,7 @@ namespace upa {
             if (order == 1) return _dbf;
             else return nullptr;
         }
+        double* getCurlBF() {return _curlbf;}
 
         // Evaluate the basis functions within the reference element (using reference coordinates).
         void evaluate(int degree, const double* coords, double *values);
@@ -45,6 +46,7 @@ namespace upa {
         double* _gC;  // Gauss points coordinates
         double* _bf;  // Basis functions evaluated at the gauss points
         double* _dbf; // Derivatives of the basis functions evaluated at the gauss points
+        double* _curlbf; // Curl of the basis functions
     };
 
 

@@ -2,6 +2,7 @@
 
 #include "referenceElement.h"
 #include "refElem_Lagrangian.h"
+#include "refElem_Nedelec.h"
 
 namespace upa {
 
@@ -26,7 +27,7 @@ namespace upa {
                 if (bforder == 1) return new RefElem<ElemType::Triangle,BFType::Lagrangian,1>();
                 if (bforder == 2) return new RefElem<ElemType::Triangle,BFType::Lagrangian,2>();
             } else if ( bftype == BFType::Nedelec) {
-
+                if (bforder == 1) return new RefElem<ElemType::Triangle,BFType::Nedelec,1>();
             }
         }
         throw std::runtime_error("getReferenceElement: Element not implemented!");

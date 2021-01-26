@@ -264,7 +264,7 @@ namespace upa {
         _dim      = 2;
         _nB       = 3;
         _bforder  = 1;
-        _elemType = ElemType::Square;
+        _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
 
         _nG  = 3;
@@ -328,7 +328,7 @@ namespace upa {
         _dim      = 2;
         _nB       = 9;
         _bforder  = 2;
-        _elemType = ElemType::Square;
+        _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
 
         _nG  = 9;
