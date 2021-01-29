@@ -29,7 +29,6 @@ add_subdirectory(src/Preconditioners) # Preconditioners and Iterators
 add_subdirectory(src/Solvers)         # Sparse Solvers
 add_subdirectory(src/Sparse)          # Sparse Matrices
 add_subdirectory(src/StructuredMesh)  # Meshes
-add_subdirectory(src/Utils)           # Utils
 
 add_subdirectory(src/Tests)           # Executables
 
