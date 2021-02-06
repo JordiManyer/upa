@@ -1,6 +1,6 @@
 
 #include "refElem_Lagrangian.h"
-
+#include "refElem_Nedelec.h"
 
 
 namespace upa {
@@ -40,12 +40,12 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Line, BFType::Lagrangian, 1>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = -(coords[0]-1)/2;
-        bf[1] = (coords[0]+1)/2;
+    void RefElem<ElemType::Line, BFType::Lagrangian, 1>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = -(refCoords[0]-1)/2;
+        bf[1] = (refCoords[0]+1)/2;
     }
 
-    void RefElem<ElemType::Line, BFType::Lagrangian, 1>::evaluateDBFs(const double *coords, double *dbf) {
+    void RefElem<ElemType::Line, BFType::Lagrangian, 1>::evaluateDBFs(const double *refCoords, double *dbf) {
         dbf[0] = -1.0/2.0;
         dbf[1] =  1.0/2.0;
     }
@@ -87,16 +87,16 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Line, BFType::Lagrangian, 2>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = coords[0] * (coords[0] - 1.0) / 2.0;
-        bf[1] = 1.0 - coords[0] * coords[0];
-        bf[2] = coords[0] * (coords[0] + 1.0) / 2.0;
+    void RefElem<ElemType::Line, BFType::Lagrangian, 2>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = refCoords[0] * (refCoords[0] - 1.0) / 2.0;
+        bf[1] = 1.0 - refCoords[0] * refCoords[0];
+        bf[2] = refCoords[0] * (refCoords[0] + 1.0) / 2.0;
     }
 
-    void RefElem<ElemType::Line, BFType::Lagrangian, 2>::evaluateDBFs(const double *coords, double *dbf) {
-        dbf[0] =  coords[0] - 1.0 / 2.0;
-        dbf[1] =  -2.0 * coords[0];
-        dbf[2] =  coords[0] - 1.0 / 2.0;
+    void RefElem<ElemType::Line, BFType::Lagrangian, 2>::evaluateDBFs(const double *refCoords, double *dbf) {
+        dbf[0] =  refCoords[0] - 1.0 / 2.0;
+        dbf[1] =  -2.0 * refCoords[0];
+        dbf[2] =  refCoords[0] - 1.0 / 2.0;
     }
 
 
@@ -138,18 +138,18 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Square, BFType::Lagrangian, 1>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = (coords[0]-1)*(coords[1]-1)/4;
-        bf[1] = -(coords[0]+1)*(coords[1]-1)/4;
-        bf[2] = (coords[0]+1)*(coords[1]+1)/4;
-        bf[3] = -(coords[0]-1)*(coords[1]+1)/4;
+    void RefElem<ElemType::Square, BFType::Lagrangian, 1>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = (refCoords[0]-1)*(refCoords[1]-1)/4;
+        bf[1] = -(refCoords[0]+1)*(refCoords[1]-1)/4;
+        bf[2] = (refCoords[0]+1)*(refCoords[1]+1)/4;
+        bf[3] = -(refCoords[0]-1)*(refCoords[1]+1)/4;
     }
 
-    void RefElem<ElemType::Square, BFType::Lagrangian, 1>::evaluateDBFs(const double *coords, double *dbf) {
-        dbf[0] = (coords[1]-1)/4  ;   dbf[1] = (coords[0]-1)/4 ;
-        dbf[2] = -(coords[1]-1)/4 ;   dbf[3] = -(coords[0]+1)/4;
-        dbf[4] = (coords[1]+1)/4  ;   dbf[5] = (coords[0]+1)/4 ;
-        dbf[6] = -(coords[1]+1)/4 ;   dbf[7] = -(coords[0]-1)/4;
+    void RefElem<ElemType::Square, BFType::Lagrangian, 1>::evaluateDBFs(const double *refCoords, double *dbf) {
+        dbf[0] = (refCoords[1]-1)/4  ;   dbf[1] = (refCoords[0]-1)/4 ;
+        dbf[2] = -(refCoords[1]-1)/4 ;   dbf[3] = -(refCoords[0]+1)/4;
+        dbf[4] = (refCoords[1]+1)/4  ;   dbf[5] = (refCoords[0]+1)/4 ;
+        dbf[6] = -(refCoords[1]+1)/4 ;   dbf[7] = -(refCoords[0]-1)/4;
     }
 
 
@@ -216,33 +216,33 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Square, BFType::Lagrangian, 2>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = (coords[0]*(coords[0]-1.0)/2.0) * (coords[1]*(coords[1]-1.0)/2.0);
-        bf[1] = (coords[0]*(coords[0]-1.0)/2.0) * (1.0-coords[1]*coords[1]);
-        bf[2] = (coords[0]*(coords[0]-1.0)/2.0) * (coords[1]*(coords[1]+1.0)/2.0);
+    void RefElem<ElemType::Square, BFType::Lagrangian, 2>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = (refCoords[0]*(refCoords[0]-1.0)/2.0) * (refCoords[1]*(refCoords[1]-1.0)/2.0);
+        bf[1] = (refCoords[0]*(refCoords[0]-1.0)/2.0) * (1.0-refCoords[1]*refCoords[1]);
+        bf[2] = (refCoords[0]*(refCoords[0]-1.0)/2.0) * (refCoords[1]*(refCoords[1]+1.0)/2.0);
 
-        bf[3] = (1.0-coords[0]*coords[0]) * (coords[1]*(coords[1]-1.0)/2.0);
-        bf[4] = (1.0-coords[0]*coords[0]) * (1.0-coords[1]*coords[1]);
-        bf[5] = (1.0-coords[0]*coords[0]) * (coords[1]*(coords[1]+1.0)/2.0);
+        bf[3] = (1.0-refCoords[0]*refCoords[0]) * (refCoords[1]*(refCoords[1]-1.0)/2.0);
+        bf[4] = (1.0-refCoords[0]*refCoords[0]) * (1.0-refCoords[1]*refCoords[1]);
+        bf[5] = (1.0-refCoords[0]*refCoords[0]) * (refCoords[1]*(refCoords[1]+1.0)/2.0);
 
-        bf[6] = (coords[0]*(coords[0]+1.0)/2.0) * (coords[1]*(coords[1]-1.0)/2.0);
-        bf[7] = (coords[0]*(coords[0]+1.0)/2.0) * (1.0-coords[1]*coords[1]);
-        bf[8] = (coords[0]*(coords[0]+1.0)/2.0) * (coords[1]*(coords[1]+1.0)/2.0);
+        bf[6] = (refCoords[0]*(refCoords[0]+1.0)/2.0) * (refCoords[1]*(refCoords[1]-1.0)/2.0);
+        bf[7] = (refCoords[0]*(refCoords[0]+1.0)/2.0) * (1.0-refCoords[1]*refCoords[1]);
+        bf[8] = (refCoords[0]*(refCoords[0]+1.0)/2.0) * (refCoords[1]*(refCoords[1]+1.0)/2.0);
     }
 
-    void RefElem<ElemType::Square, BFType::Lagrangian, 2>::evaluateDBFs(const double *coords, double *dbf) {
+    void RefElem<ElemType::Square, BFType::Lagrangian, 2>::evaluateDBFs(const double *refCoords, double *dbf) {
         // dN/dxi; dN/deta
-        dbf[0] = (coords[0]-1.0/2.0) * (coords[1]*(coords[1]-1.0)/2.0) ;  dbf[1] = (coords[0]*(coords[0]-1.0)/2.0) * (coords[1]-1.0/2.0);
-        dbf[2] = (coords[0]-1.0/2.0) * (1.0-coords[1]*coords[1]);         dbf[3] = (coords[0]*(coords[0]-1.0)/2.0) * (- 2.0*coords[1]);
-        dbf[4] = (coords[0]-1.0/2.0) * (coords[1]*(coords[1]+1.0)/2.0);   dbf[5] = (coords[0]*(coords[0]-1.0)/2.0) * (coords[1]+1.0/2.0);
+        dbf[0] = (refCoords[0]-1.0/2.0) * (refCoords[1]*(refCoords[1]-1.0)/2.0) ;  dbf[1] = (refCoords[0]*(refCoords[0]-1.0)/2.0) * (refCoords[1]-1.0/2.0);
+        dbf[2] = (refCoords[0]-1.0/2.0) * (1.0-refCoords[1]*refCoords[1]);         dbf[3] = (refCoords[0]*(refCoords[0]-1.0)/2.0) * (- 2.0*refCoords[1]);
+        dbf[4] = (refCoords[0]-1.0/2.0) * (refCoords[1]*(refCoords[1]+1.0)/2.0);   dbf[5] = (refCoords[0]*(refCoords[0]-1.0)/2.0) * (refCoords[1]+1.0/2.0);
 
-        dbf[6] = (-2.0*coords[0]) * (coords[1]*(coords[1]-1.0)/2.0) ;  dbf[7] = (1.0-coords[0]*coords[0]) * (coords[1]-1.0/2.0);
-        dbf[8] = (-2.0*coords[0]) * (1.0-coords[1]*coords[1]);         dbf[9] = (1.0-coords[0]*coords[0]) * (- 2.0*coords[1]);
-        dbf[10] = (-2.0*coords[0]) * (coords[1]*(coords[1]+1.0)/2.0);   dbf[11] = (1.0-coords[0]*coords[0]) * (coords[1]+1.0/2.0);
+        dbf[6] = (-2.0*refCoords[0]) * (refCoords[1]*(refCoords[1]-1.0)/2.0) ;  dbf[7] = (1.0-refCoords[0]*refCoords[0]) * (refCoords[1]-1.0/2.0);
+        dbf[8] = (-2.0*refCoords[0]) * (1.0-refCoords[1]*refCoords[1]);         dbf[9] = (1.0-refCoords[0]*refCoords[0]) * (- 2.0*refCoords[1]);
+        dbf[10] = (-2.0*refCoords[0]) * (refCoords[1]*(refCoords[1]+1.0)/2.0);   dbf[11] = (1.0-refCoords[0]*refCoords[0]) * (refCoords[1]+1.0/2.0);
 
-        dbf[12] = (coords[0]+1.0/2.0) * (coords[1]*(coords[1]-1.0)/2.0) ;  dbf[13] = (coords[0]*(coords[0]+1.0)/2.0) * (coords[1]-1.0/2.0);
-        dbf[14] = (coords[0]+1.0/2.0) * (1.0-coords[1]*coords[1]);         dbf[15] = (coords[0]*(coords[0]+1.0)/2.0) * (- 2.0*coords[1]);
-        dbf[16] = (coords[0]+1.0/2.0) * (coords[1]*(coords[1]+1.0)/2.0);   dbf[17] = (coords[0]*(coords[0]+1.0)/2.0) * (coords[1]+1.0/2.0);
+        dbf[12] = (refCoords[0]+1.0/2.0) * (refCoords[1]*(refCoords[1]-1.0)/2.0) ;  dbf[13] = (refCoords[0]*(refCoords[0]+1.0)/2.0) * (refCoords[1]-1.0/2.0);
+        dbf[14] = (refCoords[0]+1.0/2.0) * (1.0-refCoords[1]*refCoords[1]);         dbf[15] = (refCoords[0]*(refCoords[0]+1.0)/2.0) * (- 2.0*refCoords[1]);
+        dbf[16] = (refCoords[0]+1.0/2.0) * (refCoords[1]*(refCoords[1]+1.0)/2.0);   dbf[17] = (refCoords[0]*(refCoords[0]+1.0)/2.0) * (refCoords[1]+1.0/2.0);
     }
 
     ///**************************************************************************************************************///
@@ -295,13 +295,13 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = 1.0 - coords[0] - coords[1];
-        bf[1] = coords[0];
-        bf[2] = coords[1];
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = 1.0 - refCoords[0] - refCoords[1];
+        bf[1] = refCoords[0];
+        bf[2] = refCoords[1];
     }
 
-    void RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::evaluateDBFs(const double *coords, double *dbf) {
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::evaluateDBFs(const double *refCoords, double *dbf) {
         dbf[0] = -1.0  ; dbf[1] = -1.0 ;
         dbf[2] =  1.0  ; dbf[3] =  0.0 ;
         dbf[4] =  0.0  ; dbf[5] =  1.0 ;
@@ -369,24 +369,24 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = (1.0-coords[0]-coords[1]) * (1-2.0*coords[0]-2.0*coords[1]);
-        bf[1] = coords[0]*(2.0*coords[0]-1.0);
-        bf[2] = coords[1]*(2.0*coords[0]-1.0);
-        bf[3] = 4.0*coords[0]*(1.0-coords[0]-coords[1]);
-        bf[4] = 4.0*coords[0]*coords[1];
-        bf[5] = 4.0*coords[0]*(1.0-coords[0]-coords[1]);
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = (1.0-refCoords[0]-refCoords[1]) * (1-2.0*refCoords[0]-2.0*refCoords[1]);
+        bf[1] = refCoords[0]*(2.0*refCoords[0]-1.0);
+        bf[2] = refCoords[1]*(2.0*refCoords[0]-1.0);
+        bf[3] = 4.0*refCoords[0]*(1.0-refCoords[0]-refCoords[1]);
+        bf[4] = 4.0*refCoords[0]*refCoords[1];
+        bf[5] = 4.0*refCoords[0]*(1.0-refCoords[0]-refCoords[1]);
     }
 
-    void RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::evaluateDBFs(const double *coords, double *dbf) {
+    void RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::evaluateDBFs(const double *refCoords, double *dbf) {
         // dN/dxi; dN/deta
-        dbf[0] = -3.0 + 4.0*coords[0] + 4.0*coords[1];  dbf[1] = -3.0 + 4.0*coords[0] + 4.0*coords[1];
-        dbf[2] = 4.0*coords[0] - 1.0;                   dbf[3] = 0.0;
-        dbf[4] = 2.0*coords[1];                         dbf[5] = 2.0*coords[0] - 1.0;
+        dbf[0] = -3.0 + 4.0*refCoords[0] + 4.0*refCoords[1];  dbf[1] = -3.0 + 4.0*refCoords[0] + 4.0*refCoords[1];
+        dbf[2] = 4.0*refCoords[0] - 1.0;                   dbf[3] = 0.0;
+        dbf[4] = 2.0*refCoords[1];                         dbf[5] = 2.0*refCoords[0] - 1.0;
 
-        dbf[6]  = 4.0 - 8.0*coords[0] - 4.0*coords[1] ; dbf[7]  = -4.0*coords[0];
-        dbf[8]  = 4.0*coords[1];                        dbf[9]  = 4.0*coords[0];
-        dbf[10] = 4.0 - 8.0*coords[0] - 4.0*coords[1];  dbf[11] = -4.0*coords[0];
+        dbf[6]  = 4.0 - 8.0*refCoords[0] - 4.0*refCoords[1] ; dbf[7]  = -4.0*refCoords[0];
+        dbf[8]  = 4.0*refCoords[1];                        dbf[9]  = 4.0*refCoords[0];
+        dbf[10] = 4.0 - 8.0*refCoords[0] - 4.0*refCoords[1];  dbf[11] = -4.0*refCoords[0];
     }
 
     ///**************************************************************************************************************///

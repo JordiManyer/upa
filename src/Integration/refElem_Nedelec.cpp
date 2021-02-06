@@ -28,6 +28,8 @@ namespace upa {
         _elemType = ElemType::Triangle;
         _bftype = BFType::Nedelec;
 
+        geoElem = new RefElem<ElemType::Triangle, BFType::Lagrangian,1>();
+
         _nG = 3;
         _gW = new double[_nG];
         _gC = new double[_nG * _dim];
@@ -66,13 +68,13 @@ namespace upa {
         }
     }
 
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::evaluateBFs(const double *coords, double *bf) {
-        bf[0] = 1.0 - coords[1]; bf[1] = coords[0];
-        bf[2] = - coords[1];     bf[3] = coords[0];
-        bf[4] = - coords[1];     bf[5] = coords[0] - 1.0;
+    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = 1.0 - refCoords[1]; bf[1] = refCoords[0];
+        bf[2] = - refCoords[1];     bf[3] = refCoords[0];
+        bf[4] = - refCoords[1];     bf[5] = refCoords[0] - 1.0;
     }
 
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::evaluateDBFs(const double *coords, double *dbf) {
+    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::evaluateDBFs(const double *refCoords, double *dbf) {
         dbf[0] = 0.0; dbf[1] = -1.0;
         dbf[2] = 1.0; dbf[3] = 0.0;
         dbf[4] = 0.0; dbf[5] = -1.0;
@@ -81,6 +83,13 @@ namespace upa {
         dbf[10] = 1.0;dbf[11] = 0.0;
     }
 
+    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getJacobian(int iG, const double *nodeCoords, double *J) {
+        geoElem->getJacobian(iG, nodeCoords, J);
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getJacobian(const double* dbf, const double* nodeCoords, double* J) {
+        geoElem->getJacobian(dbf, nodeCoords, J);
+    }
 
     ///**************************************************************************************************************///
     ///**************************************************************************************************************///

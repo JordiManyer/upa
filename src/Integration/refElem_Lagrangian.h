@@ -13,8 +13,8 @@ namespace upa {
         RefElem();
         ~RefElem() override = default;
 
-        void evaluateBFs(const double* coords, double *bf) override;
-        void evaluateDBFs(const double* coords, double *dbf) override;
+        void evaluateBFs(const double* refCoords, double *bf) override;
+        void evaluateDBFs(const double* refCoords, double *dbf) override;
 
     };
 
@@ -24,8 +24,8 @@ namespace upa {
         RefElem();
         ~RefElem() override = default;
 
-        void evaluateBFs(const double* coords, double *bf) override;
-        void evaluateDBFs(const double* coords, double *dbf) override;
+        void evaluateBFs(const double* refCoords, double *bf) override;
+        void evaluateDBFs(const double* refCoords, double *dbf) override;
 
     };
 
@@ -36,8 +36,8 @@ namespace upa {
         RefElem();
         ~RefElem() override = default;
 
-        void evaluateBFs(const double* coords, double *bf) override;
-        void evaluateDBFs(const double* coords, double *dbf) override;
+        void evaluateBFs(const double* refCoords, double *bf) override;
+        void evaluateDBFs(const double* refCoords, double *dbf) override;
 
     };
 
@@ -48,8 +48,8 @@ namespace upa {
         RefElem();
         ~RefElem() override = default;
 
-        void evaluateBFs(const double* coords, double *bf) override;
-        void evaluateDBFs(const double* coords, double *dbf) override;
+        void evaluateBFs(const double* refCoords, double *bf) override;
+        void evaluateDBFs(const double* refCoords, double *dbf) override;
 
     };
 
@@ -59,8 +59,8 @@ namespace upa {
         RefElem();
         ~RefElem() override = default;
 
-        void evaluateBFs(const double* coords, double *bf) override;
-        void evaluateDBFs(const double* coords, double *dbf) override;
+        void evaluateBFs(const double* refCoords, double *bf) override;
+        void evaluateDBFs(const double* refCoords, double *dbf) override;
 
     };
 
@@ -71,8 +71,8 @@ namespace upa {
         RefElem();
         ~RefElem() override = default;
 
-        void evaluateBFs(const double* coords, double *bf) override;
-        void evaluateDBFs(const double* coords, double *dbf) override;
+        void evaluateBFs(const double* refCoords, double *bf) override;
+        void evaluateDBFs(const double* refCoords, double *dbf) override;
 
     };
 

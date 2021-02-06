@@ -30,9 +30,13 @@ namespace upa {
         double* getCurlBF() {return _curlbf;}
 
         // Evaluate the basis functions within the reference element (using reference coordinates).
-        void evaluate(int degree, const double* coords, double *values);
-        virtual void evaluateBFs(const double* coords, double *bf) = 0;
-        virtual void evaluateDBFs(const double* coords, double *dbf) = 0;
+        void evaluate(int degree, const double* refCoords, double *values);
+        virtual void evaluateBFs(const double* refCoords, double *bf) = 0;
+        virtual void evaluateDBFs(const double* refCoords, double *dbf) = 0;
+
+        // Evaluate the Jacobian matrix 1) at Gauss points, 2) at any point inside element (slower).
+        virtual void getJacobian(int iG, const double* nodeCoords, double* J);
+        virtual void getJacobian(const double* dbf, const double* nodeCoords, double* J);
 
     protected:
         int _dim;
@@ -61,6 +65,7 @@ namespace upa {
 
         void evaluateBFs(const double* coords, double *bf) override = 0;
         void evaluateDBFs(const double* coords, double *dbf) override = 0;
+
     };
 
 

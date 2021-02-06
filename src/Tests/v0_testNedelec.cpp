@@ -31,7 +31,6 @@ int main() {
     mesh->produceCartesian(dim,3,type);
 
     ReferenceElement* refElem = getReferenceElement(type,BFType::Nedelec,1);
-    ReferenceElement* refElemAux = getReferenceElement(type,BFType::Lagrangian,1); // For the coordinate change
 
 
     int nE = mesh->getNumElements();
@@ -44,8 +43,6 @@ int main() {
     double* bf = refElem->getBasisFunctions(0);
     double* dbf = refElem->getBasisFunctions(1);
     double* curlbf = refElem->getCurlBF();
-
-    double* dbf_aux = refElemAux->getBasisFunctions(1);
 
     auto sysK = new Sparse_LIL(nN);
     double sysF[nN]; for(int i = 0; i < nN; ++i) sysF[i] = 0.0;
@@ -73,16 +70,9 @@ int main() {
             double dbfk[nNbors*dim*dim]; for (int i = 0; i < nNbors*dim*dim; ++i) dbfk[i] = dbf[nNbors*dim*dim*k+i];
             double curlbfk[nNbors]; for (int i = 0; i < nNbors; ++i) curlbfk[i] = curlbf[nNbors*k+i];
 
-            double dbfk_aux[nNbors*dim]; for (int i = 0; i < nNbors*dim; ++i) dbfk_aux[i] = dbf_aux[nNbors*dim*k+i];
-
             /// Change to physical coordinates
             double J[dim*dim]; // Jacobian
-            for (int i = 0; i < dim; ++i)
-                for (int j = 0; j < dim; ++j) {
-                    J[i * dim + j] = 0.0;
-                    for (int l = 0; l < nNbors; ++l)
-                        J[i * dim + j] += dbfk_aux[dim * l + i] * nodeCoords[dim * l + j];
-                }
+            refElem->getJacobian(k,nodeCoords,J);
 
             double Jinv[dim*dim]; inverse(dim, J, Jinv);
             double detJ = det(dim,J);
