@@ -56,9 +56,9 @@ namespace upa {
         int _dim;    // Physical dimension (1D, 2D, 3D, ...)
         ElemType _elemType;
 
-        int *ENmap;       // size [nElems,nNbors]
-        std::vector<int> *EEmap;
-        double *nodeCoords; // size [nNodes,dim]
+        int *ENmap;               // Element-Node map, size [nElems,nNbors]
+        std::vector<int> *EEmap;  // Element-Element map
+        double *nodeCoords;       // Node coordinates, size [nNodes,dim]
 
     };
 

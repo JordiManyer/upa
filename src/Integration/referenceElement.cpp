@@ -63,4 +63,36 @@ namespace upa {
             }
     }
 
+    void ReferenceElement::getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) {
+        for (int i= 0; i < _dim; ++i) {
+            physicalCoords[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) physicalCoords[i] += nodeCoords[j*_dim + i] * _bf[iG*_nB + j];
+        }
+    }
+
+    void ReferenceElement::getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) {
+        double bf[_nB];
+        evaluateBFs(refCoords,bf);
+        for (int i= 0; i < _dim; ++i) {
+            physicalCoords[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) physicalCoords[i] += nodeCoords[j*_dim + i] * bf[j];
+        }
+    }
+
+    void ReferenceElement::interpolateSolution(int iG, const double* dofs, double* sol) {
+        for (int i = 0; i < _nSol; ++i) {
+            sol[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG * _nB * _nSol + j * _nSol + i] * dofs[i];
+        }
+    }
+
+    void ReferenceElement::interpolateSolution(const double* refCoords, const double* dofs, double* sol) {
+        double bf[_nB * _nSol];
+        evaluateBFs(refCoords, bf);
+        for (int i = 0; i < _nSol; ++i) {
+            sol[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) sol[i] += bf[j * _nSol + i] * dofs[i];
+        }
+    }
+
 }

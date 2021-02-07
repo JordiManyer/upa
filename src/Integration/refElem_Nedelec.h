@@ -20,6 +20,9 @@ namespace upa {
         void getJacobian(int iG, const double* nodeCoords, double* J) override;
         void getJacobian(const double* dbf, const double* nodeCoords, double* J) override;
 
+        void getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) override;
+        void getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) override;
+
     private:
         RefElem<ElemType::Triangle, BFType::Lagrangian,1> * geoElem; // Auxiliar reference element needed for geometry
     };

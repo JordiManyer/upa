@@ -18,17 +18,24 @@ using namespace upa;
  *    which can be used to find diverge-free solutions of the wave equation.
  *    Remark: The selected boundary conditions are imposed automatically by Nedelec elements.
  *    Follows closely https://www.dealii.org/reports/nedelec/nedelec.pdf
+ *
+ *    To check our implementation, we consider the domain Omega = [0,1]x[0,1]
+ *    and the analytical solution
+ *                E = [y(y-1) , x(x-1)], which fulfills E x n = 0  on delta Omega
+ *    It can then be calculated that we need to choose as source
+ *                f = curl curl E + c E = [ c y^2 - c y - 2 , c x^2 - c x - 2]
+ *
  */
 int main() {
 
-    double source[2] = {1.0,1.0}; // f
+    double source[2]; // f
     double velocity = 1.0; // c
 
     int dim = 2;
     ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,3,type);
+    mesh->produceCartesian(dim,5,type);
 
     ReferenceElement* refElem = getReferenceElement(type,BFType::Nedelec,1);
 
@@ -92,6 +99,12 @@ int main() {
             double dV = wk * detJ;
             Area += dV;
 
+            // Calculate source
+            double pCoords[dim]; // Physical coordinates (x,y) of teh Gauss point in this element
+            refElem->getPhysicalCoords(k,nodeCoords,pCoords);
+            source[0] = velocity*pCoords[1]*(pCoords[1]-1) - 2.0;
+            source[1] = velocity*pCoords[0]*(pCoords[0]-1) - 2.0;
+
             /// Integration
             // Elemental matrix
             for (int i = 0; i < nNbors; ++i) {
@@ -104,7 +117,6 @@ int main() {
             for (int i = 0; i < nNbors; ++i) {
                 for (int l = 0; l < dim; ++l) fe[i] += bfk_xy[i*dim+l] * source[l] * dV;
             }
-
         }
 
         /// Assemble
@@ -157,6 +169,45 @@ int main() {
     for (int i = 0; i < nN; ++i) {
         cout << sol[i] << " , ";
     }
+    cout << endl;
+
+    /// L2 Error of the solution, i.e Err = integral { |sol - analytical|^2 dOmega }
+    cout << endl;
+    cout << "Comparing with analytical solution: " << endl;
+
+    double Error = 0.0;
+    Area = 0.0;
+    for (int e = 0; e < nE; ++e) { // Loop in elements
+        int nodes[nNbors];
+        double nodeCoords[nNbors * dim];
+        mesh->getElemNodes(e, nodes);
+        mesh->getElemCoords(e, nodeCoords);
+
+        for (int k = 0; k < nG; ++k) { // Loop in Gauss Points
+            double dofk[nNbors];
+            for (int i = 0; i < nNbors; ++i) dofk[i] = sol[nodes[i]];
+
+            double approxE[2];
+            refElem->interpolateSolution(k,dofk,approxE);
+
+            double pCoords[dim]; // Physical coordinates (x,y) of teh Gauss point in this element
+            refElem->getPhysicalCoords(k,nodeCoords,pCoords);
+            double analE[2];
+            analE[0] = pCoords[1] * (pCoords[1] - 1.0);
+            analE[1] = pCoords[0] * (pCoords[0] - 1.0);
+
+            double wk = gW[k];
+            double J[dim*dim]; refElem->getJacobian(k,nodeCoords,J);
+            double detJ = det(dim,J);
+
+            double dV = wk * detJ;
+            Error += ((analE[0] - approxE[0]) * (analE[0] - approxE[0]) + (analE[1] - approxE[1]) * (analE[1] - approxE[1])) * dV;
+            Area += dV;
+        }
+    }
+
+    Error = sqrt(Error);
+    cout << "L2 error :: " << Error << endl;
     cout << endl;
 
 }

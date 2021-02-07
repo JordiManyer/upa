@@ -24,6 +24,7 @@ namespace upa {
     RefElem<ElemType::Triangle, BFType::Nedelec, 1>::RefElem() {
         _dim = 2;
         _nB = 3;
+        _nSol = 2;
         _bforder = 1;
         _elemType = ElemType::Triangle;
         _bftype = BFType::Nedelec;
@@ -48,19 +49,19 @@ namespace upa {
             xi = _gC[iG * _dim + 0];
             eta = _gC[iG * _dim + 1];
 
-            _bf[iG*_nB*_dim + 0*_dim + 0] = 1.0 - eta; _bf[iG*_nB*_dim + 0*_dim + 1] = xi;
-            _bf[iG*_nB*_dim + 1*_dim + 0] = - eta;     _bf[iG*_nB*_dim + 1*_dim + 1] = xi;
-            _bf[iG*_nB*_dim + 2*_dim + 0] = - eta;     _bf[iG*_nB*_dim + 2*_dim + 1] = xi - 1.0;
+            _bf[iG*_nB*_nSol + 0*_nSol + 0] = 1.0 - eta; _bf[iG*_nB*_nSol + 0*_nSol + 1] = xi;
+            _bf[iG*_nB*_nSol + 1*_nSol + 0] = - eta;     _bf[iG*_nB*_nSol + 1*_nSol + 1] = xi;
+            _bf[iG*_nB*_nSol + 2*_nSol + 0] = - eta;     _bf[iG*_nB*_nSol + 2*_nSol + 1] = xi - 1.0;
 
             // dbf/dxi; dbf/deta
-            _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 0*_dim + 1] = -1.0;
-            _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 0*_dim + 1] = -1.0;
+            _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 1*_dim + 1] = 0.0;
 
-            _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 0*_dim + 1] = -1.0;
-            _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 0*_dim + 1] = -1.0;
+            _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 1*_dim + 1] = 0.0;
 
-            _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 0*_dim + 1] = -1.0;
-            _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 0*_dim + 1] = -1.0;
+            _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 1*_dim + 1] = 0.0;
 
             _curlbf[iG*_nB + 0] = 2.0;
             _curlbf[iG*_nB + 1] = 2.0;
@@ -89,6 +90,14 @@ namespace upa {
 
     void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getJacobian(const double* dbf, const double* nodeCoords, double* J) {
         geoElem->getJacobian(dbf, nodeCoords, J);
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) {
+        geoElem->getPhysicalCoords(iG, nodeCoords, physicalCoords);
+    }
+
+    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) {
+        geoElem->getPhysicalCoords(refCoords,nodeCoords,physicalCoords);
     }
 
     ///**************************************************************************************************************///

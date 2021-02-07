@@ -13,6 +13,7 @@ namespace upa {
     RefElem<ElemType::Line, BFType::Lagrangian, 1>::RefElem() {
         _dim = 1;
         _nB = 2;
+        _nSol = 1;
         _bforder = 1;
         _elemType = ElemType::Line;
         _bftype = BFType::Lagrangian;
@@ -58,6 +59,7 @@ namespace upa {
     RefElem<ElemType::Line, BFType::Lagrangian, 2>::RefElem() {
         _dim = 1;
         _nB = 3;
+        _nSol = 1;
         _bforder = 2;
         _elemType = ElemType::Line;
         _bftype = BFType::Lagrangian;
@@ -107,6 +109,7 @@ namespace upa {
     RefElem<ElemType::Square, BFType::Lagrangian, 1>::RefElem() {
         _dim      = 2;
         _nB       = 4;
+        _nSol     = 1;
         _bforder  = 1;
         _elemType = ElemType::Square;
         _bftype   = BFType::Lagrangian;
@@ -160,6 +163,7 @@ namespace upa {
     RefElem<ElemType::Square, BFType::Lagrangian, 2>::RefElem() {
         _dim      = 2;
         _nB       = 9;
+        _nSol     = 1;
         _bforder  = 2;
         _elemType = ElemType::Square;
         _bftype   = BFType::Lagrangian;
@@ -263,6 +267,7 @@ namespace upa {
     RefElem<ElemType::Triangle, BFType::Lagrangian, 1>::RefElem() {
         _dim      = 2;
         _nB       = 3;
+        _nSol     = 1;
         _bforder  = 1;
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
@@ -327,6 +332,7 @@ namespace upa {
     RefElem<ElemType::Triangle, BFType::Lagrangian, 2>::RefElem() {
         _dim      = 2;
         _nB       = 9;
+        _nSol     = 1;
         _bforder  = 2;
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
