@@ -171,7 +171,7 @@ int main() {
     }
     cout << endl;
 
-    /// L2 Error of the solution, i.e Err = integral { |sol - analytical|^2 dOmega }
+    /// L2 Error of the solution, i.e Err = integral { |sol - analyticalSolution|^2 dOmega }
     cout << endl;
     cout << "Comparing with analytical solution: " << endl;
 
