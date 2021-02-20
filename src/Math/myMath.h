@@ -7,8 +7,13 @@
 
 namespace upa {
 
+    ///                             MISCELLANEOUS
+
     //! @brief Integer power
     int ipow(int base, int exp);
+
+
+    ///                             MATRIX AND VECTOR MANIPULATION
 
     //! @brief Determinant for small matrices
     double det(int dim, const double* A);
@@ -21,6 +26,17 @@ namespace upa {
 
     //! @brief Inverse for 2x2
     void inverse2x2(const double* A, double* Ainv);
+
+    //! @brief Dot product
+    double dot(int n, const double* x, const double* y);
+
+    ///                              INTEGRATION
+
+    //! @brief Performs the integral int{ y(x) dx} using Simpson's rule on the provided samples.
+    double Simpson(int n, const double *x, const double *y);
+
+    //! @brief Performs the integral int{ y(x) dx} using Simpson's rule on the samples iStart <= i < iEnd.
+    double Simpson(int iStart, int iEnd, const double *x, const double *y);
 
 
 }
