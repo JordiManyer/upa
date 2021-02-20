@@ -71,7 +71,7 @@ namespace upa {
         return res;
     }
 
-    
+
     double Simpson(int iStart, int iEnd, const double *x, const double *y) {
         double res = 0.0; int i = iStart;
         while (i < iEnd-2) {

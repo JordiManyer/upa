@@ -16,7 +16,7 @@ namespace upa {
     class Spline {
 
     public:
-        Spline(int n_in, double* x_in, double* y_in);
+        Spline(int n_in, const double* x_in, const double* y_in);
         ~Spline() = default;
 
         /** @brief Evaluate spline

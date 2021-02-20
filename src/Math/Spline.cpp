@@ -3,7 +3,7 @@
 
 namespace upa {
 
-    Spline::Spline(int n_in, double *x_in, double *y_in) {
+    Spline::Spline(int n_in, const double *x_in, const double *y_in) {
         double h[n_in - 1], alpha[n_in - 1], l[n_in], z[n_in], mu[n_in];
 
         n = n_in ; x = new double [n];
