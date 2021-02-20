@@ -39,7 +39,7 @@ namespace upa {
         _curlbf = new double[_nG * _nB];
 
         // Quadratures from https://arxiv.org/abs/math/0501496
-        //       w_i             x_i                y_i
+        //       w_i             xi_i                eta_i
         _gW[0] = 1.0/6.0; _gC[0] = 1.0/6.0; _gC[1] = 2.0/3.0;
         _gW[1] = 1.0/6.0; _gC[2] = 2.0/3.0; _gC[3] = 1.0/6.0;
         _gW[2] = 1.0/6.0; _gC[4] = 1.0/6.0; _gC[5] = 1.0/6.0;

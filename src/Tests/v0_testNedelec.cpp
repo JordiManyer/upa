@@ -5,6 +5,7 @@
 #include "sparse_CSR.h"
 #include "referenceElement.h"
 #include "solver_CG.h"
+#include "debugIO.h"
 
 using namespace std;
 using namespace upa;
@@ -35,7 +36,7 @@ int main() {
     ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,5,type);
+    mesh->produceCartesian(dim,3,type);
 
     ReferenceElement* refElem = getReferenceElement(type,BFType::Nedelec,1);
 
@@ -102,8 +103,8 @@ int main() {
             // Calculate source
             double pCoords[dim]; // Physical coordinates (x,y) of teh Gauss point in this element
             refElem->getPhysicalCoords(k,nodeCoords,pCoords);
-            source[0] = velocity*pCoords[1]*(pCoords[1]-1) - 2.0;
-            source[1] = velocity*pCoords[0]*(pCoords[0]-1) - 2.0;
+            source[0] = velocity*pCoords[1]*(pCoords[1]-1.0) - 2.0;
+            source[1] = velocity*pCoords[0]*(pCoords[0]-1.0) - 2.0;
 
             /// Integration
             // Elemental matrix
@@ -210,4 +211,22 @@ int main() {
     cout << "L2 error :: " << Error << endl;
     cout << endl;
 
+
+    int e = 3;
+    int nodes[nNbors];
+    double nodeCoords[nNbors * dim];
+    mesh->getElemNodes(e, nodes);
+    mesh->getElemCoords(e, nodeCoords);
+
+    double dofs[nNbors]; for (int i = 0; i < nNbors; ++i) dofs[i] = sol[nodes[i]];
+    double refCoords[2] = {0.0,0.0};
+    double approxE[2];
+    refElem->interpolateSolution(refCoords,dofs,approxE);
+
+    double coords[2]; coords[0] = nodeCoords[0]; coords[1] = nodeCoords[1];
+
+    printArray(2,coords);
+    printArray(nNbors,dofs);
+    printArray(2,approxE);
+    cout << endl;
 }
