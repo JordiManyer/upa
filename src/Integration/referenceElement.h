@@ -30,9 +30,21 @@ namespace upa {
         double* getCurlBF() {return _curlbf;}
 
         // Evaluate the basis functions within the reference element (using reference coordinates).
-        void evaluate(int degree, const double* coords, double *values);
-        virtual void evaluateBFs(const double* coords, double *bf) = 0;
-        virtual void evaluateDBFs(const double* coords, double *dbf) = 0;
+        void evaluate(int degree, const double* refCoords, double *values);
+        virtual void evaluateBFs(const double* refCoords, double *bf) = 0;
+        virtual void evaluateDBFs(const double* refCoords, double *dbf) = 0;
+
+        // Evaluate the Jacobian matrix 1) at Gauss points, 2) at any point inside element (slower).
+        virtual void getJacobian(int iG, const double* nodeCoords, double* J);
+        virtual void getJacobian(const double* dbf, const double* nodeCoords, double* J);
+
+        // Get the physical coodinates 1) at Gauss points, 2) at any point inside element (slower).
+        virtual void getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords);
+        virtual void getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords);
+
+        // Interpolate the solution 1) at Gauss points, 2) at any point inside element (slower).
+        virtual void interpolateSolution(int iG, const double* dofs, double* sol);
+        virtual void interpolateSolution(const double* refCoords, const double* dofs, double* sol);
 
     protected:
         int _dim;
@@ -42,6 +54,7 @@ namespace upa {
 
         int _nG;      // Number of gauss points
         int _nB;      // Number of basis functions
+        int _nSol;    // Dimension of solutions: 1 == scalar, 2 == 2D vector, 3 == 3D vector
         double* _gW;  // Gauss weights
         double* _gC;  // Gauss points coordinates
         double* _bf;  // Basis functions evaluated at the gauss points
@@ -61,6 +74,7 @@ namespace upa {
 
         void evaluateBFs(const double* coords, double *bf) override = 0;
         void evaluateDBFs(const double* coords, double *dbf) override = 0;
+
     };
 
 

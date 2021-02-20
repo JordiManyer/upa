@@ -75,12 +75,7 @@ int main() {
 
             /// Change to physical coordinates
             double J[dim*dim]; // Jacobian
-            for (int i = 0; i < dim; ++i)
-                for (int j = 0; j < dim; ++j) {
-                    J[i * dim + j] = 0.0;
-                    for (int l = 0; l < nNbors; ++l)
-                        J[i * dim + j] += dbfk[dim * l + i] * nodeCoords[dim * l + j];
-                }
+            refElem->getJacobian(k,nodeCoords,J);
 
             double Jinv[dim*dim]; inverse(dim, J, Jinv);
 

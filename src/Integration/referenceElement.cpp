@@ -35,11 +35,64 @@ namespace upa {
     }
 
 
-    void ReferenceElement::evaluate(int degree, const double* coords, double *values) {
-        if (degree == 0)      evaluateBFs(coords,values);
-        else if (degree == 1) evaluateDBFs(coords,values);
+    void ReferenceElement::evaluate(int degree, const double* refCoords, double *values) {
+        if (degree == 0)      evaluateBFs(refCoords,values);
+        else if (degree == 1) evaluateDBFs(refCoords,values);
         else throw std::runtime_error("ReferenceElement::evaluate : Derivative order too high!");
     }
 
+
+    void ReferenceElement::getJacobian(int iG, const double *nodeCoords, double *J) {
+        for (int i = 0; i < _dim; ++i)
+            for (int j = 0; j < _dim; ++j) {
+                J[i*_dim + j] = 0.0;
+                for (int l = 0; l < _nB; ++l)
+                    J[i*_dim + j] += _dbf[_nB*_dim*iG + _dim*l + i] * nodeCoords[_dim*l + j];
+            }
+    }
+
+
+    void ReferenceElement::getJacobian(const double* refCoords, const double* nodeCoords, double* J) {
+        double dbf[_nB*_dim];
+        evaluateDBFs(refCoords,dbf);
+        for (int i = 0; i < _dim; ++i)
+            for (int j = 0; j < _dim; ++j) {
+                J[i*_dim + j] = 0.0;
+                for (int l = 0; l < _nB; ++l)
+                    J[i*_dim + j] += dbf[_dim*l + i] * nodeCoords[_dim*l + j];
+            }
+    }
+
+    void ReferenceElement::getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) {
+        for (int i= 0; i < _dim; ++i) {
+            physicalCoords[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) physicalCoords[i] += nodeCoords[j*_dim + i] * _bf[iG*_nB + j];
+        }
+    }
+
+    void ReferenceElement::getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) {
+        double bf[_nB];
+        evaluateBFs(refCoords,bf);
+        for (int i= 0; i < _dim; ++i) {
+            physicalCoords[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) physicalCoords[i] += nodeCoords[j*_dim + i] * bf[j];
+        }
+    }
+
+    void ReferenceElement::interpolateSolution(int iG, const double* dofs, double* sol) {
+        for (int i = 0; i < _nSol; ++i) {
+            sol[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG * _nB * _nSol + j * _nSol + i] * dofs[i];
+        }
+    }
+
+    void ReferenceElement::interpolateSolution(const double* refCoords, const double* dofs, double* sol) {
+        double bf[_nB * _nSol];
+        evaluateBFs(refCoords, bf);
+        for (int i = 0; i < _nSol; ++i) {
+            sol[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) sol[i] += bf[j * _nSol + i] * dofs[i];
+        }
+    }
 
 }
