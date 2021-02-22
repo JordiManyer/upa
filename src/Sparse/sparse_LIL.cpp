@@ -24,7 +24,7 @@ namespace upa {
 
         if (it == A[i].end()) { // Element does not exist --> Create element
             A[i].push_back(std::make_pair(j, value));
-            sort(A[i].rbegin(), A[i].rend());
+            sort(A[i].begin(), A[i].end());
             ++nnz;
         } else { // Element already exists --> Add value to element
             it->second = value;
@@ -37,7 +37,7 @@ namespace upa {
 
         if (it == A[i].end()) { // Element does not exist --> Create element
             A[i].push_back(std::make_pair(j, value));
-            sort(A[i].rbegin(), A[i].rend());
+            sort(A[i].begin(), A[i].end());
             ++nnz;
         } else { // Element already exists --> Add value to element
             it->second += value;
