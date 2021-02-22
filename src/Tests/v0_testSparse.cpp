@@ -9,14 +9,14 @@ using namespace upa;
 
 
 int main() {
-    int n = 10;
+    int n = 4;
     Sparse_LIL lil(n);
 
     ///  Assembling the matrix in LIL format
     for (int i = 0; i < n; ++i) {
-        lil.put(i,i,2.0);
-        if (i != 0  ) lil.put(i,i-1,-1.0);
-        if (i != n-1) lil.put(i,i+1,-1.0);
+        lil.put(i,i,10.0);
+        if (i != 0  ) lil.put(i,i-1,-5.0);
+        if (i != n-1) lil.put(i,i+1,-5.0);
     }
 
     /// Convert to CSR
@@ -33,7 +33,7 @@ int main() {
     // System declaration
     double b[n], x[n], x0[n], r[n];
     for (int i = 0; i < n; ++i) {
-        b[i] = 1.0;
+        b[i] = 0.2;
         x0[i] = 1.0;
     }
 
