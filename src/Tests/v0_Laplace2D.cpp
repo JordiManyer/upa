@@ -200,7 +200,39 @@ int main() {
         cout << analyticalSol << "  ,  ";
     }
     nodalError = sqrt(nodalError);
+    cout << endl << "Nodal error of the solution: " << nodalError << endl;
 
-    cout << endl << "Calculated error of the solution: " << nodalError << endl;
+
+    double Error = 0.0;
+    Area = 0.0;
+    for (int e = 0; e < nE; ++e) { // Loop in elements
+        int nodes[nNbors];
+        double nodeCoords[nNbors * dim];
+        mesh->getElemNodes(e, nodes);
+        mesh->getElemCoords(e, nodeCoords);
+
+        for (int k = 0; k < nG; ++k) { // Loop in Gauss Points
+            double dofk[nNbors];
+            for (int i = 0; i < nNbors; ++i) dofk[i] = sol[nodes[i]];
+
+            double approxSol;
+            refElem->interpolateSolution(k, dofk, &approxSol);
+
+            double pCoords[dim]; // Physical coordinates (x,y) of the Gauss point in this element
+            refElem->getPhysicalCoords(k, nodeCoords, pCoords);
+            double analSol = -source/2.0 * pCoords[1]*pCoords[1] + source * pCoords[1];;
+
+            double wk = gW[k];
+            double J[dim * dim];
+            refElem->getJacobian(k, nodeCoords, J);
+            double detJ = det(dim, J);
+
+            double dV = wk * detJ;
+            Error += (analSol - approxSol) * (analSol - approxSol) * dV;
+            Area += dV;
+        }
+
+    }
+    cout << endl << "L2 error of the solution: " << sqrt(Error) << endl;
 
 }

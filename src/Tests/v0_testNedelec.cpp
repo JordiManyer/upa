@@ -79,7 +79,7 @@ int main() {
             double curlbfk[nNbors]; for (int i = 0; i < nNbors; ++i) curlbfk[i] = curlbf[nNbors*k+i];
 
             /// Change to physical coordinates
-            double J[dim*dim]; // Jacobian
+            double J[dim*dim]; // Jacobian, dx/dxi
             refElem->getJacobian(k,nodeCoords,J);
 
             double Jinv[dim*dim]; inverse(dim, J, Jinv);
@@ -101,7 +101,7 @@ int main() {
             Area += dV;
 
             // Calculate source
-            double pCoords[dim]; // Physical coordinates (x,y) of teh Gauss point in this element
+            double pCoords[dim]; // Physical coordinates (x,y) of the Gauss point in this element
             refElem->getPhysicalCoords(k,nodeCoords,pCoords);
             source[0] = velocity*pCoords[1]*(pCoords[1]-1.0) - 2.0;
             source[1] = velocity*pCoords[0]*(pCoords[0]-1.0) - 2.0;
@@ -172,6 +172,8 @@ int main() {
     }
     cout << endl;
 
+
+
     /// L2 Error of the solution, i.e Err = integral { |sol - analyticalSolution|^2 dOmega }
     cout << endl;
     cout << "Comparing with analytical solution: " << endl;
@@ -188,18 +190,27 @@ int main() {
             double dofk[nNbors];
             for (int i = 0; i < nNbors; ++i) dofk[i] = sol[nodes[i]];
 
-            double approxE[2];
-            refElem->interpolateSolution(k,dofk,approxE);
+            double wk = gW[k];
+            double J[dim*dim]; refElem->getJacobian(k,nodeCoords,J);
+            double Jinv[dim*dim]; inverse(dim,J,Jinv);
+            double detJ = det(dim,J);
 
-            double pCoords[dim]; // Physical coordinates (x,y) of teh Gauss point in this element
+            /// TODO: This should be done as part of interpolateSolution() in Nedelec!
+            double approxE[2], auxE[2];
+            refElem->interpolateSolution(k,dofk,auxE);
+            for (int i = 0; i < dim; ++i) {
+                approxE[i] = 0.0;
+                for (int j = 0; j < dim; ++j) {
+                    approxE[i] += Jinv[i*dim + j] * auxE[j];
+                }
+            }
+
+            double pCoords[dim]; // Physical coordinates (x,y) of the
+            // Gauss point in this element
             refElem->getPhysicalCoords(k,nodeCoords,pCoords);
             double analE[2];
             analE[0] = pCoords[1] * (pCoords[1] - 1.0);
             analE[1] = pCoords[0] * (pCoords[0] - 1.0);
-
-            double wk = gW[k];
-            double J[dim*dim]; refElem->getJacobian(k,nodeCoords,J);
-            double detJ = det(dim,J);
 
             double dV = wk * detJ;
             Error += ((analE[0] - approxE[0]) * (analE[0] - approxE[0]) + (analE[1] - approxE[1]) * (analE[1] - approxE[1])) * dV;
@@ -211,22 +222,4 @@ int main() {
     cout << "L2 error :: " << Error << endl;
     cout << endl;
 
-
-    int e = 3;
-    int nodes[nNbors];
-    double nodeCoords[nNbors * dim];
-    mesh->getElemNodes(e, nodes);
-    mesh->getElemCoords(e, nodeCoords);
-
-    double dofs[nNbors]; for (int i = 0; i < nNbors; ++i) dofs[i] = sol[nodes[i]];
-    double refCoords[2] = {0.0,0.0};
-    double approxE[2];
-    refElem->interpolateSolution(refCoords,dofs,approxE);
-
-    double coords[2]; coords[0] = nodeCoords[0]; coords[1] = nodeCoords[1];
-
-    printArray(2,coords);
-    printArray(nNbors,dofs);
-    printArray(2,approxE);
-    cout << endl;
 }
