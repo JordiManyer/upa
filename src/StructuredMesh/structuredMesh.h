@@ -27,13 +27,19 @@ namespace upa {
         int  getNumElements() const { return _nElems; }
         int  getNumNodes() const { return _nNodes;}
         int  getNumElemNbors() const { return _nNbors;}
+        int  getNumEdges() const { return _nEdges;}
         int  getNumNborElems(int e) const { return EEmap[e].size();}
+        int  getNumNborNodes(int d) const { return NNmap[d].size();}
         ElemType getElemType() {return _elemType;}
 
         void getElemNodes(int e, int *dofs);
         void getElemNbors(int e, int *nbors);
         void getElemCoords(int e, double *dofCoords);
+        void getElemEdges(int e, int *edges);
         void getNodeCoords(int d, double *dofCoords);
+        void getNodeNbors(int d, int *nbors);
+        void getEdgeNodes(int e, int *nodes);
+
 
         // Auxiliar functions
 
@@ -49,6 +55,9 @@ namespace upa {
          */
         int findContainingElem(double* coords, int e0 = -1);
 
+        // Edge elements
+        void produceEdges();
+
     private:
         int _nElems; // Number of elements in the mesh
         int _nNodes; // Number of nodes in the mesh
@@ -58,7 +67,13 @@ namespace upa {
 
         int *ENmap;               // Element-Node map, size [nElems,nNbors]
         std::vector<int> *EEmap;  // Element-Element map
+        std::vector<int> *NNmap;  // Node-Node map
         double *nodeCoords;       // Node coordinates, size [nNodes,dim]
+
+        // Edge elements
+        int _nEdges;
+        int *edgeNodes;           // Nodes in each edge [nEdges,2]
+        int *edgeMap;             // Element-Edge map [nElems,nNbors]
 
     };
 
