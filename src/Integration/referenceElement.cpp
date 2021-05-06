@@ -12,8 +12,6 @@ namespace upa {
             if ( bftype == BFType::Lagrangian) {
                 if (bforder == 1) return new RefElem<ElemType::Line,BFType::Lagrangian,1>();
                 if (bforder == 2) return new RefElem<ElemType::Line,BFType::Lagrangian,2>();
-            } else if ( bftype == BFType::Nedelec) {
-
             }
         } else if (etype == ElemType::Square) {
             if ( bftype == BFType::Lagrangian) {
@@ -82,7 +80,7 @@ namespace upa {
     void ReferenceElement::interpolateSolution(int iG, const double* dofs, double* sol) {
         for (int i = 0; i < _nSol; ++i) {
             sol[i] = 0.0;
-            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG * _nB * _nSol + j * _nSol + i] * dofs[i];
+            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG*_nB*_nSol + j*_nSol + i] * dofs[j];
         }
     }
 
@@ -91,7 +89,7 @@ namespace upa {
         evaluateBFs(refCoords, bf);
         for (int i = 0; i < _nSol; ++i) {
             sol[i] = 0.0;
-            for (int j = 0; j < _nB; ++j) sol[i] += bf[j * _nSol + i] * dofs[i];
+            for (int j = 0; j < _nB; ++j) sol[i] += bf[j *_nSol + i] * dofs[i];
         }
     }
 

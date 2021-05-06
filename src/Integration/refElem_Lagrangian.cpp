@@ -1,6 +1,7 @@
 
 #include "refElem_Lagrangian.h"
 #include "refElem_Nedelec.h"
+#include <iostream>
 
 
 namespace upa {
@@ -18,16 +19,11 @@ namespace upa {
         _elemType = ElemType::Line;
         _bftype = BFType::Lagrangian;
 
-        _nG = 2;
-        _gW = new double[_nG];
-        _gC = new double[_nG * _dim];
-        _bf = new double[_nG * _nB];
-        _dbf = new double[_nG * _nB * _dim];
-
-        _gW[0] = 1.0; _gW[1] = 1.0;
-        _gC[0] = -1 / sqrt(3); _gC[1] = 1 / sqrt(3);
+        getQuadratureGauss_Line(1, _nG, &_gC, &_gW);
 
         double xi;
+        _bf = new double[_nG * _nB];
+        _dbf = new double[_nG * _nB * _dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG * _dim + 0];
 
@@ -64,16 +60,11 @@ namespace upa {
         _elemType = ElemType::Line;
         _bftype = BFType::Lagrangian;
 
-        _nG = 3;
-        _gW = new double[_nG];
-        _gC = new double[_nG * _dim];
-        _bf = new double[_nG * _nB];
-        _dbf = new double[_nG * _nB * _dim];
-
-        _gW[0] = 5.0/9.0;            _gW[1] = 8.0/9.0; _gW[2] = 5.0/9.0;
-        _gC[0] = - sqrt(3.0/5.0); _gC[1] = 0.0;     _gC[2] = sqrt(3.0/5.0);
+        getQuadratureGauss_Line(2, _nG, &_gC, &_gW);
 
         double xi;
+        _bf = new double[_nG * _nB];
+        _dbf = new double[_nG * _nB * _dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG * _dim + 0];
 
@@ -114,17 +105,11 @@ namespace upa {
         _elemType = ElemType::Square;
         _bftype   = BFType::Lagrangian;
 
-        _nG  = 4;
-        _gW  = new double[_nG];
-        _gC  = new double[_nG*_dim];
-        _bf  = new double[_nG*_nB];
-        _dbf = new double[_nG*_nB*_dim];
-
-        _gW[0] = 1.0; _gW[1] = 1.0; _gW[2] = 1.0; _gW[3] = 1.0;
-        _gC[0] = -1/sqrt(3); _gC[2] = 1/sqrt(3); _gC[4] = 1/sqrt(3); _gC[6] = -1/sqrt(3); // x
-        _gC[1] = -1/sqrt(3); _gC[3] = -1/sqrt(3); _gC[5] = 1/sqrt(3); _gC[7] = 1/sqrt(3); // y
+        getQuadratureGauss_Square(1, _nG, &_gC, &_gW);
 
         double xi,eta;
+        _bf  = new double[_nG*_nB];
+        _dbf = new double[_nG*_nB*_dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG*_dim+0]; eta = _gC[iG*_dim+1];
 
@@ -168,26 +153,11 @@ namespace upa {
         _elemType = ElemType::Square;
         _bftype   = BFType::Lagrangian;
 
-        _nG  = 9;
-        _gW  = new double[_nG];
-        _gC  = new double[_nG*_dim];
-        _bf  = new double[_nG*_nB];
-        _dbf = new double[_nG*_nB*_dim];
-
-        _gW[0] = 25.0/81.0; _gW[1] = 40.0/81.0; _gW[2] = 25.0/81.0;
-        _gW[3] = 40.0/81.0; _gW[4] = 64.0/81.0; _gW[5] = 40.0/81.0;
-        _gW[6] = 25.0/81.0; _gW[7] = 40.0/81.0; _gW[8] = 25.0/81.0;
-
-        _gC[0] = - sqrt(3.0/5.0); _gC[2] = - sqrt(3.0/5.0); _gC[4] = - sqrt(3.0/5.0); // x
-        _gC[1] = - sqrt(3.0/5.0); _gC[3] = 0.0;                _gC[5] =   sqrt(3.0/5.0); // y
-
-        _gC[6] = 0.0;                _gC[8] = 0.0;                _gC[10] = 0.0; // x
-        _gC[7] = - sqrt(3.0/5.0); _gC[9] = 0.0;                _gC[11] =   sqrt(3.0/5.0); // y
-
-        _gC[12] = sqrt(3.0/5.0);   _gC[14] = sqrt(3.0/5.0); _gC[16] = sqrt(3.0/5.0); // x
-        _gC[13] = - sqrt(3.0/5.0); _gC[15] = 0.0;              _gC[17] = sqrt(3.0/5.0); // y
+        getQuadratureGauss_Square(2, _nG, &_gC, &_gW);
 
         double xi,eta;
+        _bf  = new double[_nG*_nB];
+        _dbf = new double[_nG*_nB*_dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG*_dim+0]; eta = _gC[iG*_dim+1];
 
@@ -272,19 +242,11 @@ namespace upa {
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
 
-        _nG  = 3;
-        _gW  = new double[_nG];
-        _gC  = new double[_nG*_dim];
-        _bf  = new double[_nG*_nB];
-        _dbf = new double[_nG*_nB*_dim];
-
-        // Quadratures from https://arxiv.org/abs/math/0501496
-        //       w_i             x_i                y_i
-        _gW[0] = 1.0/6.0; _gC[0] = 1.0/6.0; _gC[1] = 2.0/3.0;
-        _gW[1] = 1.0/6.0; _gC[2] = 2.0/3.0; _gC[3] = 1.0/6.0;
-        _gW[2] = 1.0/6.0; _gC[4] = 1.0/6.0; _gC[5] = 1.0/6.0;
+        getQuadratureGauss_Triangle(1, _nG, &_gC, &_gW);
 
         double xi,eta;
+        _bf  = new double[_nG*_nB];
+        _dbf = new double[_nG*_nB*_dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG*_dim+0]; eta = _gC[iG*_dim+1];
 
@@ -337,22 +299,11 @@ namespace upa {
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
 
-        _nG  = 9;
-        _gW  = new double[_nG];
-        _gC  = new double[_nG*_dim];
-        _bf  = new double[_nG*_nB];
-        _dbf = new double[_nG*_nB*_dim];
-
-        // Quadratures from https://arxiv.org/abs/math/0501496
-        //       w_i                        x_i                         y_i
-        _gW[0] = 0.2199034873106; _gC[0]  = 0.0915762135098; _gC[1]  = 0.0915762135098;
-        _gW[1] = 0.2199034873106; _gC[2]  = 0.8168475729805; _gC[3]  = 0.0915762135098;
-        _gW[2] = 0.2199034873106; _gC[4]  = 0.0915762135098; _gC[5]  = 0.8168475729805;
-        _gW[3] = 0.4467631793560; _gC[6]  = 0.1081030181681; _gC[7]  = 0.4459484909160;
-        _gW[4] = 0.4467631793560; _gC[8]  = 0.4459484909160; _gC[9]  = 0.1081030181681;
-        _gW[5] = 0.4467631793560; _gC[10] = 0.4459484909160; _gC[11] = 0.4459484909160;
+        getQuadratureGauss_Triangle(2, _nG, &_gC, &_gW);
 
         double xi,eta;
+        _bf  = new double[_nG*_nB];
+        _dbf = new double[_nG*_nB*_dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG*_dim+0]; eta = _gC[iG*_dim+1];
 
