@@ -10,7 +10,7 @@
 namespace upa {
 
 
-    /** @brief Reference Element base class, specialised to obtain different types of elements
+    /** @brief Reference Element base class, later specialised to obtain different types of elements
      */
     class ReferenceElement {
 
@@ -35,16 +35,16 @@ namespace upa {
         virtual void evaluateDBFs(const double* refCoords, double *dbf) = 0;
 
         // Evaluate the Jacobian matrix 1) at Gauss points, 2) at any point inside element (slower).
-        virtual void getJacobian(int iG, const double* nodeCoords, double* J);
-        virtual void getJacobian(const double* dbf, const double* nodeCoords, double* J);
+        virtual void getJacobian(int iG, const double* nodeCoords, double* J) = 0;
+        virtual void getJacobian(const double* dbf, const double* nodeCoords, double* J) = 0;
 
         // Get the physical coodinates 1) at Gauss points, 2) at any point inside element (slower).
-        virtual void getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords);
-        virtual void getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords);
+        virtual void getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) = 0;
+        virtual void getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) = 0;
 
         // Interpolate the solution 1) at Gauss points, 2) at any point inside element (slower).
-        virtual void interpolateSolution(int iG, const double* dofs, double* sol);
-        virtual void interpolateSolution(const double* refCoords, const double* dofs, double* sol);
+        virtual void interpolateSolution(int iG, const double* dofs, double* sol) = 0;
+        virtual void interpolateSolution(const double* refCoords, const double* dofs, double* sol) = 0;
 
     protected:
         int _dim;
@@ -63,19 +63,6 @@ namespace upa {
     };
 
 
-    /** @brief Templated class, derived from base class.
-     *         Template specialisations will create different elements.
-     */
-    template<ElemType etype, BFType bftype, int>
-    class RefElem : public ReferenceElement {
-    public:
-        RefElem() = default;
-        ~RefElem() override = default;
-
-        void evaluateBFs(const double* coords, double *bf) override = 0;
-        void evaluateDBFs(const double* coords, double *dbf) override = 0;
-
-    };
 
 
     /** @brief Factory method for reference elements.

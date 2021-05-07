@@ -36,13 +36,15 @@ int main() {
     ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,3,type);
+    mesh->produceCartesian(dim,2,type);
+    mesh->produceEdges();
 
     ReferenceElement* refElem = getReferenceElement(type,BFType::Nedelec,1);
 
 
-    int nE = mesh->getNumElements();
-    int nN = mesh->getNumNodes();
+    int nE   = mesh->getNumElements();
+    int nN   = mesh->getNumNodes();
+    int nDOF = mesh->getNumEdges();
     int nNbors = mesh->getNumElemNbors();
 
     int nG = refElem->getNumGaussPoints();
@@ -52,15 +54,52 @@ int main() {
     double* dbf = refElem->getBasisFunctions(1);
     double* curlbf = refElem->getCurlBF();
 
-    auto sysK = new Sparse_LIL(nN);
-    double sysF[nN]; for(int i = 0; i < nN; ++i) sysF[i] = 0.0;
+
+    // Identify nodes in the Dirichlet boundary.
+    int boundaryDir[nN]; for (int d = 0; d < nN; ++d) boundaryDir[d] = 0;
+    bool corner[nN]; for (int d = 0; d < nN; ++d) corner[d] = false;
+    for (int d = 0; d < nN; ++d) {
+        double coords[dim];
+        mesh->getNodeCoords(d, coords);
+
+        if (fabs(coords[1] - 0.0) < 1.e-3) boundaryDir[d] = 1;
+        if (fabs(coords[0] - 0.0) < 1.e-3) boundaryDir[d] = 2;
+        if (fabs(coords[1] - 1.0) < 1.e-3) boundaryDir[d] = 3;
+        if (fabs(coords[0] - 1.0) < 1.e-3) boundaryDir[d] = 4;
+        corner[d] = ((fabs(coords[1] - 0.0) < 1.e-3) and (fabs(coords[0] - 0.0) < 1.e-3)) or
+                    ((fabs(coords[1] - 1.0) < 1.e-3) and (fabs(coords[0] - 0.0) < 1.e-3)) or
+                    ((fabs(coords[1] - 1.0) < 1.e-3) and (fabs(coords[0] - 1.0) < 1.e-3)) or
+                    ((fabs(coords[1] - 0.0) < 1.e-3) and (fabs(coords[0] - 1.0) < 1.e-3));
+    }
+    // Identify edges in the Dirichlet boundary
+    int nBoundary = 0;
+    bool edgesDir[nDOF]; for (int d = 0; d < nN; ++d) edgesDir[d] = false;
+    for (int e = 0; e < nDOF; ++e) {
+        int nodes[2];
+        mesh->getEdgeNodes(e,nodes);
+        edgesDir[e] = (boundaryDir[nodes[0]] != 0 and boundaryDir[nodes[1]] != 0 and boundaryDir[nodes[0]] == boundaryDir[nodes[1]]) or
+                      (corner[nodes[0]] and boundaryDir[nodes[1]] != 0) or (corner[nodes[1]] and boundaryDir[nodes[0]] != 0);
+        if (edgesDir[e]) nBoundary++;
+    }
+
+    printArray(nDOF,edgesDir);
+
+    auto sysK = new Sparse_LIL(nDOF+nBoundary);
+    double sysF[nDOF+nBoundary]; for(int i = 0; i < nDOF+nBoundary; ++i) sysF[i] = 0.0;
     double Area = 0.0;
 
     for (int e = 0; e < nE; ++e) { // Loop in elements
-        int nodes[nNbors];
+        int nodes[nNbors], edges[nNbors], edgeSigns[nNbors];
         double nodeCoords[nNbors*dim];
         mesh->getElemNodes(e,nodes);
         mesh->getElemCoords(e,nodeCoords);
+        mesh->getElemEdges(e,edges);
+
+        for (int i = 0; i < nNbors; ++i) { // Specific for triangles. Careful!
+            if ( i != nNbors-1 and nodes[i] < nodes[i+1]) edgeSigns[i] = 1;
+            else if ( i == nNbors-1 and nodes[i] < nodes[0]) edgeSigns[i] = 1;
+            else edgeSigns[i] = -1;
+        }
 
         double Ke[nNbors*nNbors];
         double fe[nNbors];
@@ -100,11 +139,12 @@ int main() {
             double dV = wk * detJ;
             Area += dV;
 
-            // Calculate source
+            // Calculate source f = curl curl E + c E
             double pCoords[dim]; // Physical coordinates (x,y) of the Gauss point in this element
             refElem->getPhysicalCoords(k,nodeCoords,pCoords);
-            source[0] = velocity*pCoords[1]*(pCoords[1]-1.0) - 2.0;
-            source[1] = velocity*pCoords[0]*(pCoords[0]-1.0) - 2.0;
+            double x = pCoords[0]; double y = pCoords[1];
+            source[0] =  velocity*(4*y*y*y - 6*y*y+ 2*y) + (12 - 24*y);
+            source[1] = -velocity*(-5*x*x*x*x+ 8*x*x*x - 3*x*x) + (60*x*x - 48*x + 6);
 
             /// Integration
             // Elemental matrix
@@ -123,9 +163,27 @@ int main() {
         /// Assemble
         for (int i = 0; i < nNbors; ++i) {
             for (int j = 0; j < nNbors; ++j) {
-                sysK->assemble(nodes[i], nodes[j], Ke[i*nNbors+j]);
+                sysK->assemble(edges[i], edges[j], edgeSigns[i] * edgeSigns[j] * Ke[i*nNbors+j]);
             }
-            sysF[nodes[i]] += fe[i];
+            sysF[edges[i]] += edgeSigns[i] * fe[i];
+        }
+    }
+
+    /** Apply boundaryDir conditions (using Lagrange multipliers)
+     *           | A  K^t |
+     * A_final = | K  0   |
+     *
+     * b_final^t = [b,e]^t
+     *
+     * with K^t x = e the constraints we want to enforce
+     */
+    int iB = 0;
+    for (int e = 0; e < nDOF; ++e) {
+        if (edgesDir[e]) {
+            sysK->assemble(e,nDOF+iB,1.0);
+            sysK->assemble(nDOF+iB,e,1.0);
+            sysF[nDOF+iB] = 0.0;
+            iB++;
         }
     }
 
@@ -134,8 +192,8 @@ int main() {
     auto sysK_solve = new Sparse_CSR(sysK);
 
     cout << "Complete matrix: " << endl;
-    for (int i = 0; i < nN; ++i) {
-        for (int j = 0; j < nN ; ++j) {
+    for (int i = 0; i < nDOF+nBoundary; ++i) {
+        for (int j = 0; j < nDOF+nBoundary ; ++j) {
             cout << "    " << sysK_solve->operator()(i,j);
         }
         cout << endl;
@@ -143,31 +201,31 @@ int main() {
     cout << endl;
 
     cout << "Complete vector: " << endl;
-    for (int i = 0; i < nN; ++i) {
+    for (int i = 0; i < nDOF+nBoundary; ++i) {
         cout << "    " << sysF[i];
     }
     cout << endl;
 
     // Create solver
-    auto CG = new Solver_CG(nN,sysK_solve,sysF);
+    auto CG = new Solver_CG(nDOF+nBoundary,sysK_solve,sysF);
     CG->setIterations(1000);
-    CG->setTolerance(0.000001);
+    CG->setTolerance(1.e-12);
     CG->setVerbosity(1);
 
     // Solve
-    double x0[nN];
-    for (int i = 0; i < nN; ++i) x0[i] = 0.0;
+    double x0[nDOF+nBoundary];
+    for (int i = 0; i < nDOF+nBoundary; ++i) x0[i] = 0.0;
     CG->solve(x0);
 
     // Output
-    double sol[nN];
+    double sol[nDOF+nBoundary];
     CG->getSolution(sol);
     cout << "Converged : " << CG->getConvergence() << endl;
     cout << "Number of iterations: " << CG->getNumIter() << endl;
     cout << "Error2 : " << CG->getError() << endl;
 
     cout << "x = " << endl;
-    for (int i = 0; i < nN; ++i) {
+    for (int i = 0; i < nDOF+nBoundary; ++i) {
         cout << sol[i] << " , ";
     }
     cout << endl;
@@ -181,23 +239,36 @@ int main() {
     double Error = 0.0;
     Area = 0.0;
     for (int e = 0; e < nE; ++e) { // Loop in elements
-        int nodes[nNbors];
-        double nodeCoords[nNbors * dim];
-        mesh->getElemNodes(e, nodes);
-        mesh->getElemCoords(e, nodeCoords);
+        int nodes[nNbors], edges[nNbors], edgeSigns[nNbors];
+        double nodeCoords[nNbors*dim];
+        mesh->getElemNodes(e,nodes);
+        mesh->getElemCoords(e,nodeCoords);
+        mesh->getElemEdges(e,edges);
+
+        for (int i = 0; i < nNbors; ++i) { // Specific for triangles. Careful!
+            if ( i != nNbors-1 and nodes[i] < nodes[i+1]) edgeSigns[i] = 1;
+            else if ( i == nNbors-1 and nodes[i] < nodes[0]) edgeSigns[i] = 1;
+            else edgeSigns[i] = -1;
+        }
 
         for (int k = 0; k < nG; ++k) { // Loop in Gauss Points
             double dofk[nNbors];
-            for (int i = 0; i < nNbors; ++i) dofk[i] = sol[nodes[i]];
+            for (int i = 0; i < nNbors; ++i) dofk[i] = sol[edges[i]];
 
             double wk = gW[k];
+            double bfk[nNbors*dim]; for (int i = 0; i < nNbors*dim; ++i) bfk[i] = bf[nNbors*dim*k+i];
             double J[dim*dim]; refElem->getJacobian(k,nodeCoords,J);
             double Jinv[dim*dim]; inverse(dim,J,Jinv);
             double detJ = det(dim,J);
 
             /// TODO: This should be done as part of interpolateSolution() in Nedelec!
             double approxE[2], auxE[2];
-            refElem->interpolateSolution(k,dofk,auxE);
+            for (int i = 0; i < dim; ++i) {
+                auxE[i] = 0.0;
+                for (int j = 0; j < nNbors; ++j) {
+                    auxE[i] += edgeSigns[j] * bfk[j*dim+i] * dofk[j];
+                }
+            }
             for (int i = 0; i < dim; ++i) {
                 approxE[i] = 0.0;
                 for (int j = 0; j < dim; ++j) {
@@ -209,8 +280,9 @@ int main() {
             // Gauss point in this element
             refElem->getPhysicalCoords(k,nodeCoords,pCoords);
             double analE[2];
-            analE[0] = pCoords[1] * (pCoords[1] - 1.0);
-            analE[1] = pCoords[0] * (pCoords[0] - 1.0);
+            double x = pCoords[0]; double y = pCoords[1];
+            analE[0] =  velocity*(4*y*y*y - 6*y*y+ 2*y);
+            analE[1] = -velocity*(-5*x*x*x*x+ 8*x*x*x - 3*x*x);
 
             double dV = wk * detJ;
             Error += ((analE[0] - approxE[0]) * (analE[0] - approxE[0]) + (analE[1] - approxE[1]) * (analE[1] - approxE[1])) * dV;

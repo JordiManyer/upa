@@ -132,8 +132,8 @@ namespace upa {
                     ENmap[(2*i) * _nNbors + 2] = i + nSide + 1 + i/nSide;
 
                     ENmap[(2*i+1) * _nNbors + 0] = i + nSide + 2 + i/nSide;
-                    ENmap[(2*i+1) * _nNbors + 1] = i + 1 + i/nSide;
-                    ENmap[(2*i+1) * _nNbors + 2] = i + nSide + 1 + i/nSide;
+                    ENmap[(2*i+1) * _nNbors + 1] = i + nSide + 1 + i/nSide;
+                    ENmap[(2*i+1) * _nNbors + 2] = i + 1 + i/nSide;
                 }
                 for (int i = 0; i < nSide; ++i) { // For each square, we do bottom triangle then top triangle
                     for (int j = 0; j < nSide; ++j) {

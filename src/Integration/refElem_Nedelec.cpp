@@ -3,6 +3,72 @@
 
 namespace upa {
 
+    /*******************************************************************************************************************
+     *****                                    GENERAL FUNCTIONS
+     ******************************************************************************************************************/
+    template<ElemType etype, int order>
+    RefElem_Nedelec<etype, order>::RefElem_Nedelec() {
+        throw std::runtime_error("RefElem_Lagrange: Element not implemented!");
+    }
+
+    template<ElemType etype, int order>
+    void RefElem_Nedelec<etype, order>::getJacobian(int iG, const double *nodeCoords, double *J) {
+        for (int i = 0; i < _dim; ++i)
+            for (int j = 0; j < _dim; ++j) {
+                J[i*_dim + j] = 0.0;
+                for (int l = 0; l < _nB; ++l)
+                    J[i*_dim + j] += _geo_dbf[_nB*_dim*iG + _dim*l + i] * nodeCoords[_dim*l + j];
+            }
+    }
+
+    template<ElemType etype, int order>
+    void RefElem_Nedelec<etype, order>::getJacobian(const double* refCoords, const double* nodeCoords, double* J) {
+        double dbf[_nB*_dim];
+        geo_evaluateDBFs(refCoords,dbf);
+        for (int i = 0; i < _dim; ++i)
+            for (int j = 0; j < _dim; ++j) {
+                J[i*_dim + j] = 0.0;
+                for (int l = 0; l < _nB; ++l)
+                    J[i*_dim + j] += dbf[_dim*l + i] * nodeCoords[_dim*l + j];
+            }
+    }
+
+    template<ElemType etype, int order>
+    void RefElem_Nedelec<etype, order>::getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) {
+        for (int i= 0; i < _dim; ++i) {
+            physicalCoords[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) physicalCoords[i] += nodeCoords[j*_dim + i] * _geo_bf[iG*_nB + j];
+        }
+    }
+
+    template<ElemType etype, int order>
+    void RefElem_Nedelec<etype, order>::getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) {
+        double bf[_nB];
+        geo_evaluateBFs(refCoords,bf);
+        for (int i= 0; i < _dim; ++i) {
+            physicalCoords[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) physicalCoords[i] += nodeCoords[j*_dim + i] * bf[j];
+        }
+    }
+
+    template<ElemType etype, int order>
+    void RefElem_Nedelec<etype, order>::interpolateSolution(int iG, const double* dofs, double* sol) {
+        for (int i = 0; i < _nSol; ++i) {
+            sol[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG*_nB*_nSol + j*_nSol + i] * dofs[j];
+        }
+    }
+
+    template<ElemType etype, int order>
+    void RefElem_Nedelec<etype, order>::interpolateSolution(const double* refCoords, const double* dofs, double* sol) {
+        double bf[_nB * _nSol];
+        evaluateBFs(refCoords, bf);
+        for (int i = 0; i < _nSol; ++i) {
+            sol[i] = 0.0;
+            for (int j = 0; j < _nB; ++j) sol[i] += bf[j *_nSol + i] * dofs[j];
+        }
+    }
+
     ///**************************************************************************************************************///
     ///**************************************************************************************************************///
 
@@ -21,7 +87,8 @@ namespace upa {
      *                    e0
      */
 
-    RefElem<ElemType::Triangle, BFType::Nedelec, 1>::RefElem() {
+    template <>
+    RefElem_Nedelec<ElemType::Triangle, 1>::RefElem_Nedelec() {
         _dim = 2;
         _nB = 3;
         _nSol = 2;
@@ -29,22 +96,14 @@ namespace upa {
         _elemType = ElemType::Triangle;
         _bftype = BFType::Nedelec;
 
-        geoElem = new RefElem<ElemType::Triangle, BFType::Lagrangian,1>();
-
-        _nG = 3;
-        _gW = new double[_nG];
-        _gC = new double[_nG * _dim];
-        _bf = new double[_nG * _nB * _dim];
-        _dbf = new double[_nG * _nB * _dim * _dim];
-        _curlbf = new double[_nG * _nB];
-
-        // Quadratures from https://arxiv.org/abs/math/0501496
-        //       w_i             xi_i                eta_i
-        _gW[0] = 1.0/6.0; _gC[0] = 1.0/6.0; _gC[1] = 2.0/3.0;
-        _gW[1] = 1.0/6.0; _gC[2] = 2.0/3.0; _gC[3] = 1.0/6.0;
-        _gW[2] = 1.0/6.0; _gC[4] = 1.0/6.0; _gC[5] = 1.0/6.0;
+        getQuadratureGauss_Triangle(1, _nG, &_gC, &_gW);
 
         double xi, eta;
+        _bf      = new double[_nG * _nB * _dim];
+        _dbf     = new double[_nG * _nB * _dim * _dim];
+        _curlbf  = new double[_nG * _nB];
+        _geo_bf  = new double[_nG * _nB];
+        _geo_dbf = new double[_nG * _nB * _dim];
         for (int iG = 0; iG < _nG; ++iG) {
             xi = _gC[iG * _dim + 0];
             eta = _gC[iG * _dim + 1];
@@ -66,16 +125,27 @@ namespace upa {
             _curlbf[iG*_nB + 0] = 2.0;
             _curlbf[iG*_nB + 1] = 2.0;
             _curlbf[iG*_nB + 2] = 2.0;
+
+            // Geometry
+            _geo_bf[iG*_nB + 0] = 1.0 - xi -eta;
+            _geo_bf[iG*_nB + 1] = xi;
+            _geo_bf[iG*_nB + 2] = eta;
+
+            _geo_dbf[iG*_nB*_dim + 0*_dim + 0] = -1.0;  _geo_dbf[iG*_nB*_dim + 0*_dim + 1] = -1.0;
+            _geo_dbf[iG*_nB*_dim + 1*_dim + 0] = 1.0;   _geo_dbf[iG*_nB*_dim + 1*_dim + 1] = 0.0;
+            _geo_dbf[iG*_nB*_dim + 2*_dim + 0] = 0.0;   _geo_dbf[iG*_nB*_dim + 2*_dim + 1] = 1.0;
         }
     }
 
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::evaluateBFs(const double *refCoords, double *bf) {
+    template <>
+    void RefElem_Nedelec<ElemType::Triangle, 1>::evaluateBFs(const double *refCoords, double *bf) {
         bf[0] = 1.0 - refCoords[1]; bf[1] = refCoords[0];
         bf[2] = - refCoords[1];     bf[3] = refCoords[0];
         bf[4] = - refCoords[1];     bf[5] = refCoords[0] - 1.0;
     }
 
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::evaluateDBFs(const double *refCoords, double *dbf) {
+    template <>
+    void RefElem_Nedelec<ElemType::Triangle, 1>::evaluateDBFs(const double *refCoords, double *dbf) {
         dbf[0] = 0.0; dbf[1] = -1.0;
         dbf[2] = 1.0; dbf[3] = 0.0;
         dbf[4] = 0.0; dbf[5] = -1.0;
@@ -84,20 +154,18 @@ namespace upa {
         dbf[10] = 1.0;dbf[11] = 0.0;
     }
 
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getJacobian(int iG, const double *nodeCoords, double *J) {
-        geoElem->getJacobian(iG, nodeCoords, J);
+    template <>
+    void RefElem_Nedelec<ElemType::Triangle, 1>::geo_evaluateBFs(const double *refCoords, double *bf) {
+        bf[0] = 1.0 - refCoords[0] - refCoords[1];
+        bf[1] = refCoords[0];
+        bf[2] = refCoords[1];
     }
 
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getJacobian(const double* dbf, const double* nodeCoords, double* J) {
-        geoElem->getJacobian(dbf, nodeCoords, J);
-    }
-
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getPhysicalCoords(int iG, const double* nodeCoords, double* physicalCoords) {
-        geoElem->getPhysicalCoords(iG, nodeCoords, physicalCoords);
-    }
-
-    void RefElem<ElemType::Triangle, BFType::Nedelec, 1>::getPhysicalCoords(const double* refCoords, const double* nodeCoords, double* physicalCoords) {
-        geoElem->getPhysicalCoords(refCoords,nodeCoords,physicalCoords);
+    template <>
+    void RefElem_Nedelec<ElemType::Triangle, 1>::geo_evaluateDBFs(const double *refCoords, double *dbf) {
+        dbf[0] = -1.0  ; dbf[1] = -1.0 ;
+        dbf[2] =  1.0  ; dbf[3] =  0.0 ;
+        dbf[4] =  0.0  ; dbf[5] =  1.0 ;
     }
 
     ///**************************************************************************************************************///
