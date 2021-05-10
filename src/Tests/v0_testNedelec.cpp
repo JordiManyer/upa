@@ -169,6 +169,8 @@ int main() {
         }
     }
 
+    cout << "AREA = " << Area << endl;
+
     /** Apply boundaryDir conditions (using Lagrange multipliers)
      *           | A  K^t |
      * A_final = | K  0   |

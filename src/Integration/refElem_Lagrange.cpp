@@ -311,7 +311,7 @@ namespace upa {
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
 
-        getQuadratureGauss_Triangle(1, _nG, &_gC, &_gW);
+        getQuadratureGauss_Triangle(2, _nG, &_gC, &_gW);
 
         double xi,eta;
         _bf  = new double[_nG*_nB];

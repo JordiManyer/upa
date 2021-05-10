@@ -25,7 +25,7 @@ int main() {
     double source = 1.0;
 
     int dim = 2;
-    ElemType type = ElemType::Square;
+    ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
     mesh->produceCartesian(dim,10,type);
