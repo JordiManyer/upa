@@ -28,6 +28,21 @@ namespace upa {
         else for (int i = 0; i < EEmap[e].size(); ++i) nbors[i] = EEmap[e][i];
     }
 
+    void StructuredMesh::getNodeNbors(int d, int *nbors) {
+        if (d > _nNodes) throw std::runtime_error("StructuredMesh: Node ID out of range.");
+        else for (int i = 0; i < NNmap[d].size(); ++i) nbors[i] = NNmap[d][i];
+    }
+
+    void StructuredMesh::getElemEdges(int e, int *edges) {
+        if (e > _nElems) throw std::runtime_error("StructuredMesh: Elem ID out of range.");
+        else for (int i = 0; i < _nNbors; ++i) edges[i] = edgeMap[e*_nNbors+i];
+    }
+
+    void StructuredMesh::getEdgeNodes(int e, int *nodes) {
+        if (e > _nEdges) throw std::runtime_error("StructuredMesh: Edge ID out of range.");
+        else for (int i = 0; i < 2; ++i) nodes[i] = edgeNodes[e*2+i];
+    }
+
     void StructuredMesh::produceCartesian(int dim, int nSide, ElemType type) {
         _dim = dim;
         _elemType = type;
@@ -55,6 +70,7 @@ namespace upa {
                 _nNbors = 2;
                 ENmap = new int[_nElems*_nNbors];
                 EEmap = new std::vector<int>[_nElems];
+                NNmap = new std::vector<int>[_nNodes];
 
                 for (int i = 0; i < _nElems; ++i) {
                     ENmap[i*_nNbors + 0] = i;
@@ -64,6 +80,10 @@ namespace upa {
                     if (i != 0) EEmap[i].push_back(i-1);
                     if (i != _nElems-1) EEmap[i].push_back(i+1);
                 }
+                for (int i = 0; i < _nNodes; ++i) {
+                    if (i != 0) NNmap[i].push_back(i-1);
+                    if (i != _nNodes-1) NNmap[i].push_back(i+1);
+                }
                 break;
 
             case ElemType::Square:
@@ -72,6 +92,7 @@ namespace upa {
                 _nNbors = 4;
                 ENmap = new int[_nElems*_nNbors];
                 EEmap = new std::vector<int>[_nElems];
+                NNmap = new std::vector<int>[_nNodes];
 
                 for (int i = 0; i < _nElems; ++i) {
                     ENmap[i * _nNbors + 0] = i + i/nSide;
@@ -87,14 +108,23 @@ namespace upa {
                         if (j != nSide-1) EEmap[i*nSide+j].push_back(i*nSide + j+1);
                     }
                 }
+                for (int i = 0; i < nSide+1; ++i) {
+                    for (int j = 0; j < nSide+1; ++j) {
+                        if (i != 0)     NNmap[i*(nSide+1)+j].push_back((i-1)*(nSide+1) + j);
+                        if (j != 0)     NNmap[i*(nSide+1)+j].push_back(i*(nSide+1) + j-1);
+                        if (j != nSide) NNmap[i*(nSide+1)+j].push_back(i*(nSide+1) + j+1);
+                        if (i != nSide) NNmap[i*(nSide+1)+j].push_back((i+1)*(nSide+1) + j);
+                    }
+                }
                 break;
 
             case ElemType::Triangle:
-                if (dim != 2) throw std::runtime_error("StructuredMesh: ElemType::Square needs dim = 2");
+                if (dim != 2) throw std::runtime_error("StructuredMesh: ElemType::Triangle needs dim = 2");
                 _nElems = 2*ipow(nSide,dim);
                 _nNbors = 3;
                 ENmap = new int[_nElems*_nNbors];
                 EEmap = new std::vector<int>[_nElems];
+                NNmap = new std::vector<int>[_nNodes];
 
                 for (int i = 0; i < _nElems/2; ++i) { // For each square, we do bottom triangle then top triangle
                     ENmap[(2*i) * _nNbors + 0] = i + i/nSide;
@@ -114,6 +144,16 @@ namespace upa {
                         EEmap[i*2*nSide+2*j+1].push_back(i*2*nSide+2*j);
                         if (j != nSide-1) EEmap[i*2*nSide+2*j+1].push_back(i*2*nSide+2*j+2);
                         if (i != nSide-1) EEmap[i*2*nSide+2*j+1].push_back((i+1)*2*nSide+2*j);
+                    }
+                }
+                for (int i = 0; i < nSide+1; ++i) {
+                    for (int j = 0; j < nSide+1; ++j) {
+                        if (i != 0)                NNmap[i*(nSide+1)+j].push_back((i-1)*(nSide+1) + j);
+                        if (i != 0 and j != nSide) NNmap[i*(nSide+1)+j].push_back((i-1)*(nSide+1) + j+1);
+                        if (j != 0)                NNmap[i*(nSide+1)+j].push_back(i*(nSide+1) + j-1);
+                        if (j != nSide)            NNmap[i*(nSide+1)+j].push_back(i*(nSide+1) + j+1);
+                        if (i != nSide and j != 0) NNmap[i*(nSide+1)+j].push_back((i+1)*(nSide+1) + j-1);
+                        if (i != nSide)            NNmap[i*(nSide+1)+j].push_back((i+1)*(nSide+1) + j);
                     }
                 }
                 break;
@@ -187,6 +227,55 @@ namespace upa {
             }
         }
         return -1;
+    }
+
+    void StructuredMesh::produceEdges() {
+        if (_dim < 2) throw std::runtime_error("StructuredMesh: produceEdges() only for dim > 1.");
+
+        // Count edges
+        _nEdges = 0;
+        for (int i = 0; i < _nNodes; ++i) _nEdges += NNmap[i].size();
+        _nEdges /= 2;
+
+        // Find edge ordering
+        edgeNodes = new int[_nEdges*2];
+        int k = 0; int indexes[_nNodes+1]; indexes[0] = 0;
+        for (int d = 0; d < _nNodes; ++d) {
+            for (auto i : NNmap[d])
+                if (i > d) {
+                    edgeNodes[k*2+0] = d;
+                    edgeNodes[k*2+1] = i;
+                    k++;
+                }
+            indexes[d+1] = k;
+        }
+
+        // Create Element-Edge map
+        edgeMap = new int[_nElems*_nNbors];
+        for (int e = 0; e < _nElems; ++e) {
+            // Get list of edges for this element
+            int edges[_nNbors*2];
+            if (_elemType == ElemType::Square) {
+                edges[0] = ENmap[e*_nNbors+0]; edges[1] = ENmap[e*_nNbors+1];
+                edges[2] = ENmap[e*_nNbors+1]; edges[3] = ENmap[e*_nNbors+2];
+                edges[4] = ENmap[e*_nNbors+2]; edges[5] = ENmap[e*_nNbors+3];
+                edges[6] = ENmap[e*_nNbors+3]; edges[7] = ENmap[e*_nNbors+0];
+            } else if (_elemType == ElemType::Triangle) {
+                edges[0] = ENmap[e*_nNbors+0]; edges[1] = ENmap[e*_nNbors+1];
+                edges[2] = ENmap[e*_nNbors+1]; edges[3] = ENmap[e*_nNbors+2];
+                edges[4] = ENmap[e*_nNbors+2]; edges[5] = ENmap[e*_nNbors+0];
+            }
+
+            // For each element edge, look for its numbering.
+            for (int i = 0; i < _nNbors; ++i) {
+                if (edges[i*2+0] > edges[i*2+1]) { // We want lower-indexed node first.
+                    int swap = edges[i*2+0]; edges[i*2+0] = edges[i*2+1]; edges[i*2+1] = swap;
+                }
+                k = indexes[edges[i*2+0]];
+                while (k < indexes[edges[i*2+0]+1] and edgeNodes[k*2+1] != edges[i*2+1]) ++k;
+                edgeMap[e*_nNbors+i] = k;
+            }
+        }
     }
 
 }

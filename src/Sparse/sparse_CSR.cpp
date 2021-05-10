@@ -45,12 +45,13 @@ namespace upa {
         // Count selected rows and number of non-zero entries
         n = 0;
         nnz = 0;
+        int indexMap[lil->n];
         for (int i = 0; i < lil->n; ++i) {
             if (select[i]) { // Only consider selected rows
-                n++;
+                indexMap[i] = n++;
                 for (auto e = lil->A[i].begin(); e < lil->A[i].end(); ++e)
                     if (select[e->first]) ++nnz; // Only consider selected columns
-            }
+            } else indexMap[i] = -1;
         }
 
         rows = new int[n + 1];
@@ -60,16 +61,14 @@ namespace upa {
         int iCsr = 0; int k = 0; int skipped = 0;
         for (int iLil = 0; iLil < lil->n; ++iLil) {
             if (select[iLil]) {
-                rows[iCsr + 1] = rows[iCsr] + lil->A[iLil].size();
-
-                // TODO: We need to modify the column... -> Count skipped dofs and substract from .first
                 k = rows[iCsr];
                 for (auto e = lil->A[iLil].begin(); e < lil->A[iLil].end(); ++e)
                     if (select[e->first]) {
-                        cols[k] = e->first - skipped;
+                        cols[k] = indexMap[e->first];
                         values[k] = e->second;
                         ++k;
                     }
+                rows[iCsr + 1] = k;
                 iCsr++;
             } else ++skipped;
         }

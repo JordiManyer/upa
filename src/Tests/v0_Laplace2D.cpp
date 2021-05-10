@@ -9,7 +9,17 @@
 using namespace std;
 using namespace upa;
 
-
+/***********************************************************************************
+ *               TUTORIAL: 2D Laplace with Lagrangian elements
+ *
+ *     This tutorial solves
+ *                   -Lap(u)   = s    ,   (x,y) in [0,1]x[0,1]
+ *                   u(x,y)    = 0.0      in  y = 0
+ *                   Grad(u)·n = 1.0      in  x = 0, x = 1, y = 1
+ *
+ *     with analytical solution
+ *                   u(x,y) = -s/2 y^2 + sy
+ ***********************************************************************************/
 int main() {
 
     double source = 1.0;
@@ -18,7 +28,7 @@ int main() {
     ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,2,type);
+    mesh->produceCartesian(dim,10,type);
 
     ReferenceElement* refElem = getReferenceElement(type,BFType::Lagrangian,1);
 
@@ -41,7 +51,7 @@ int main() {
         double coords[dim];
         mesh->getNodeCoords(d, coords);
 
-        boundaryDir[d] = (fabs(coords[1] - 0.0) < 1.e-3);
+        boundaryDir[d]  = (fabs(coords[1] - 0.0) < 1.e-3);
         boundaryNew[d] = (fabs(coords[0] - 0.0) < 1.e-3) or (fabs(coords[1] - 1.0) < 1.e-3) or (fabs(coords[0] - 1.0) < 1.e-3);
         if (boundaryDir[d]) nBoundary++;
     }
@@ -102,7 +112,7 @@ int main() {
             // Elemental vector
             for (int i = 0; i < nNbors; ++i) {
                 fe[i] += bfk[i] * source * dV;
-                if (boundaryNew[nodes[i]]) fe[i] += bfk[i] * 1.0 * dV;
+                if (boundaryNew[nodes[i]]) fe[i] += bfk[i] * 0.0 * dV;
             }
 
         }
@@ -158,7 +168,7 @@ int main() {
     // Create solver
     auto CG = new Solver_CG(nN+nBoundary,sysK_solve,sysF);
     CG->setIterations(1000);
-    CG->setTolerance(0.000001);
+    CG->setTolerance(1.e-12);
     CG->setVerbosity(1);
 
     // Solve
@@ -167,7 +177,7 @@ int main() {
     CG->solve(x0);
 
     // Output
-    double sol[nN];
+    double sol[nN+nBoundary];
     CG->getSolution(sol);
     cout << "Converged : " << CG->getConvergence() << endl;
     cout << "Number of iterations: " << CG->getNumIter() << endl;
@@ -178,5 +188,51 @@ int main() {
         cout << sol[i] << " , ";
     }
     cout << endl;
+
+
+    /// Postprocess :: Getting some approximation of the error
+    // The analytical solution is u(x) = s/2 ( - x^2 + x)
+    double nodalError = 0.0;
+    for (int i = 0; i < nN; ++i) {
+        double coords[2]; mesh->getNodeCoords(i, coords);
+        double analyticalSol = -source/2.0 * coords[1]*coords[1] + source * coords[1];
+        nodalError += (sol[i] - analyticalSol)*(sol[i] - analyticalSol);
+        cout << analyticalSol << "  ,  ";
+    }
+    nodalError = sqrt(nodalError);
+    cout << endl << "Nodal error of the solution: " << nodalError << endl;
+
+
+    double Error = 0.0;
+    Area = 0.0;
+    for (int e = 0; e < nE; ++e) { // Loop in elements
+        int nodes[nNbors];
+        double nodeCoords[nNbors * dim];
+        mesh->getElemNodes(e, nodes);
+        mesh->getElemCoords(e, nodeCoords);
+
+        for (int k = 0; k < nG; ++k) { // Loop in Gauss Points
+            double dofk[nNbors];
+            for (int i = 0; i < nNbors; ++i) dofk[i] = sol[nodes[i]];
+
+            double approxSol;
+            refElem->interpolateSolution(k, dofk, &approxSol);
+
+            double pCoords[dim]; // Physical coordinates (x,y) of the Gauss point in this element
+            refElem->getPhysicalCoords(k, nodeCoords, pCoords);
+            double analSol = -source/2.0 * pCoords[1]*pCoords[1] + source * pCoords[1];;
+
+            double wk = gW[k];
+            double J[dim * dim];
+            refElem->getJacobian(k, nodeCoords, J);
+            double detJ = det(dim, J);
+
+            double dV = wk * detJ;
+            Error += (analSol - approxSol) * (analSol - approxSol) * dV;
+            Area += dV;
+        }
+
+    }
+    cout << endl << "L2 error of the solution: " << sqrt(Error) << endl;
 
 }

@@ -24,7 +24,7 @@ int main() {
     ElemType etype = ElemType::Line;     // Type of element
     BFType bftype  = BFType::Lagrangian; // Type of basis function
     int bforder    = 1;                  // Order of basis function
-    int nElems = 11;                     // Number of elements in the mesh
+    int nElems = 5;                     // Number of elements in the mesh
 
     double source = 1.0; // Source ('s' in the equation), here constant in the domain
 
@@ -63,6 +63,7 @@ int main() {
      *           - Therefore we need a second loop, which does the sum mentioned above in each element.
      *
      */
+    double area = 0.0;
     for (int e = 0; e < nE; ++e) { // Loop in elements
 
         // Create elemental matrix and vector.
@@ -108,16 +109,16 @@ int main() {
             }
 
             double dV = wk * det(dim, J);
+            area += dV;
 
             /// Integration
             for (int i = 0; i < nNbors; ++i) {
                 for (int j = 0; j < nNbors; ++j) {
-                    for (int l = 0; l < dim; ++l) Ke[i*nNbors+j] += grad[i*dim+l] * grad[j*dim+l];
-                    Ke[i*nNbors+j] *= dV;
+                    for (int l = 0; l < dim; ++l) Ke[i*nNbors+j] += grad[i*dim+l] * grad[j*dim+l] * dV;
                 }
             }
             for (int i = 0; i < nNbors; ++i) {
-                fe[i]  = bfk[i] * source * dV;
+                fe[i]  += bfk[i] * source * dV;
             }
 
         } // End of gauss point loop
@@ -173,7 +174,7 @@ int main() {
     cout << endl;
 
     cout << "Complete Vector: " << endl;
-    for (int i = 0; i < nSelect; ++i) cout << "    " << sysF_solve[i];
+    printArray(nSelect,sysF_solve);
     cout << endl;
 
 
@@ -185,24 +186,42 @@ int main() {
 
     // Solve
     double x0[nSelect];
-    for (int i = 0; i < nN; ++i) x0[i] = 1.0;
+    for (int i = 0; i < nSelect; ++i) x0[i] = 1.0;
     CG->solve(x0);
 
     // Output
-    double sol[nSelect];
-    CG->getSolution(sol);
+    double sol[nN];
+    double aux[nSelect];
+    CG->getSolution(aux);
+    k = 0;
+    for (int i = 0; i < nN; ++i) {
+        if (select[i]) {
+            sol[i] = aux[k]; k++;
+        } else sol[i] = value;
+    }
+
     cout << "Converged : " << CG->getConvergence() << endl;
     cout << "Number of iterations: " << CG->getNumIter() << endl;
     cout << "Error2 : " << CG->getError() << endl;
 
     cout << "x = " << endl;
-    k = 0;
     for (int i = 0; i < nN; ++i) {
-        if (select[i]) {
-            cout << sol[k] << " , "; k++;
-        } else cout << value << " , ";
+        cout << sol[i] << " , ";
     }
     cout << endl;
+
+    /// Postprocess :: Getting some approximation of the error
+    // The analytical solution is u(x) = s/2 ( - x^2 + x)
+    double nodalError = 0.0;
+    for (int i = 0; i < nN; ++i) {
+        double x; mesh->getNodeCoords(i, &x);
+        double analyticalSol = source/2.0 * ( -x*x + x);
+        nodalError += (sol[i] - analyticalSol)*(sol[i] - analyticalSol);
+        cout << analyticalSol << "  ,  ";
+    }
+    nodalError = sqrt(nodalError);
+
+    cout << endl << "Calculated error of the solution: " << nodalError << endl;
 
 }
 

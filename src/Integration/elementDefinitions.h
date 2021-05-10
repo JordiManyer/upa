@@ -37,7 +37,7 @@ namespace upa {
     /***************     BASIS TYPES     ********************/
     enum class BFType {
         Lagrangian, // Polynomial basis such that Ni(xj) = delta_ij
-        Nedelec
+        Nedelec     // Polynomial vector basis such that integral_ej { Ni · tj } = delta_ij
     };
 
 }
