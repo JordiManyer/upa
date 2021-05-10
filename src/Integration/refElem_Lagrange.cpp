@@ -56,7 +56,7 @@ namespace upa {
     template<ElemType etype, int order>
     void RefElem_Lagrange<etype, order>::interpolateSolution(int iG, const double* dofs, double* sol) {
         *sol = 0.0;
-        for (int j = 0; j < _nB; ++j) *sol += _bf[iG*_nB*_nSol + j] * dofs[j];
+        for (int j = 0; j < _nB; ++j) *sol += _bf[iG*_nB + j] * dofs[j];
     }
 
     template<ElemType etype, int order>
@@ -77,7 +77,6 @@ namespace upa {
     RefElem_Lagrange<ElemType::Line, 1>::RefElem_Lagrange() {
         _dim = 1;
         _nB = 2;
-        _nSol = 1;
         _bforder = 1;
         _elemType = ElemType::Line;
         _bftype = BFType::Lagrangian;
@@ -119,7 +118,6 @@ namespace upa {
     RefElem_Lagrange<ElemType::Line, 2>::RefElem_Lagrange() {
         _dim = 1;
         _nB = 3;
-        _nSol = 1;
         _bforder = 2;
         _elemType = ElemType::Line;
         _bftype = BFType::Lagrangian;
@@ -165,7 +163,6 @@ namespace upa {
     RefElem_Lagrange<ElemType::Square, 1>::RefElem_Lagrange() {
         _dim      = 2;
         _nB       = 4;
-        _nSol     = 1;
         _bforder  = 1;
         _elemType = ElemType::Square;
         _bftype   = BFType::Lagrangian;
@@ -215,7 +212,6 @@ namespace upa {
     RefElem_Lagrange<ElemType::Square, 2>::RefElem_Lagrange() {
         _dim      = 2;
         _nB       = 9;
-        _nSol     = 1;
         _bforder  = 2;
         _elemType = ElemType::Square;
         _bftype   = BFType::Lagrangian;
@@ -306,7 +302,6 @@ namespace upa {
     RefElem_Lagrange<ElemType::Triangle, 1>::RefElem_Lagrange() {
         _dim      = 2;
         _nB       = 3;
-        _nSol     = 1;
         _bforder  = 1;
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;
@@ -365,7 +360,6 @@ namespace upa {
     RefElem_Lagrange<ElemType::Triangle, 2>::RefElem_Lagrange() {
         _dim      = 2;
         _nB       = 9;
-        _nSol     = 1;
         _bforder  = 2;
         _elemType = ElemType::Triangle;
         _bftype   = BFType::Lagrangian;

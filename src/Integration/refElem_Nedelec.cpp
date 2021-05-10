@@ -8,7 +8,7 @@ namespace upa {
      ******************************************************************************************************************/
     template<ElemType etype, int order>
     RefElem_Nedelec<etype, order>::RefElem_Nedelec() {
-        throw std::runtime_error("RefElem_Lagrange: Element not implemented!");
+        throw std::runtime_error("RefElem_Nedelec: Element not implemented!");
     }
 
     template<ElemType etype, int order>
@@ -53,20 +53,22 @@ namespace upa {
 
     template<ElemType etype, int order>
     void RefElem_Nedelec<etype, order>::interpolateSolution(int iG, const double* dofs, double* sol) {
-        for (int i = 0; i < _nSol; ++i) {
+        for (int i = 0; i < _dim; ++i) {
             sol[i] = 0.0;
-            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG*_nB*_nSol + j*_nSol + i] * dofs[j];
+            for (int j = 0; j < _nB; ++j) sol[i] += _bf[iG*_nB*_dim + j*_dim + i] * dofs[j];
         }
+        // TODO: We need to multiply by the Jacobian!! But how to do it without an extra argument?
     }
 
     template<ElemType etype, int order>
     void RefElem_Nedelec<etype, order>::interpolateSolution(const double* refCoords, const double* dofs, double* sol) {
-        double bf[_nB * _nSol];
+        double bf[_nB * _dim];
         evaluateBFs(refCoords, bf);
-        for (int i = 0; i < _nSol; ++i) {
+        for (int i = 0; i < _dim; ++i) {
             sol[i] = 0.0;
-            for (int j = 0; j < _nB; ++j) sol[i] += bf[j *_nSol + i] * dofs[j];
+            for (int j = 0; j < _nB; ++j) sol[i] += bf[j *_dim + i] * dofs[j];
         }
+        // TODO: We need to multiply by the Jacobian!! But how to do it without an extra argument?
     }
 
     ///**************************************************************************************************************///
@@ -91,7 +93,6 @@ namespace upa {
     RefElem_Nedelec<ElemType::Triangle, 1>::RefElem_Nedelec() {
         _dim = 2;
         _nB = 3;
-        _nSol = 2;
         _bforder = 1;
         _elemType = ElemType::Triangle;
         _bftype = BFType::Nedelec;
@@ -108,19 +109,19 @@ namespace upa {
             xi = _gC[iG * _dim + 0];
             eta = _gC[iG * _dim + 1];
 
-            _bf[iG*_nB*_nSol + 0*_nSol + 0] = 1.0 - eta; _bf[iG*_nB*_nSol + 0*_nSol + 1] = xi;
-            _bf[iG*_nB*_nSol + 1*_nSol + 0] = - eta;     _bf[iG*_nB*_nSol + 1*_nSol + 1] = xi;
-            _bf[iG*_nB*_nSol + 2*_nSol + 0] = - eta;     _bf[iG*_nB*_nSol + 2*_nSol + 1] = xi - 1.0;
+            _bf[iG*_nB*_dim + 0*_dim + 0] = 1.0 - eta; _bf[iG*_nB*_dim + 0*_dim + 1] = xi;
+            _bf[iG*_nB*_dim + 1*_dim + 0] = - eta;     _bf[iG*_nB*_dim + 1*_dim + 1] = xi;
+            _bf[iG*_nB*_dim + 2*_dim + 0] = - eta;     _bf[iG*_nB*_dim + 2*_dim + 1] = xi - 1.0;
 
             // dbf/dxi; dbf/deta
-            _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 0*_dim + 1] = -1.0;
-            _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_nSol*_dim + 0*_nSol*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 0*_dim + 1] = -1.0;
+            _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_dim*_dim + 0*_dim*_dim + 1*_dim + 1] = 0.0;
 
-            _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 0*_dim + 1] = -1.0;
-            _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_nSol*_dim + 1*_nSol*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 0*_dim + 1] = -1.0;
+            _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_dim*_dim + 1*_dim*_dim + 1*_dim + 1] = 0.0;
 
-            _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 0*_dim + 1] = -1.0;
-            _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_nSol*_dim + 2*_nSol*_dim + 1*_dim + 1] = 0.0;
+            _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 0*_dim + 0] = 0.0; _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 0*_dim + 1] = -1.0;
+            _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 1*_dim + 0] = 1.0; _dbf[iG*_nB*_dim*_dim + 2*_dim*_dim + 1*_dim + 1] = 0.0;
 
             _curlbf[iG*_nB + 0] = 2.0;
             _curlbf[iG*_nB + 1] = 2.0;

@@ -17,16 +17,20 @@ using namespace upa;
  *        E x n = 0                 on delta Omega
  *
  *    which can be used to find diverge-free solutions of the wave equation.
- *    Remark: The selected boundary conditions are imposed automatically by Nedelec elements.
+ *    Remark: The selected boundary conditions are imposed as regular Dirichlet BCs by Nedelec elements.
  *    Follows closely https://www.dealii.org/reports/nedelec/nedelec.pdf
  *
  *    To check our implementation, we consider the domain Omega = [0,1]x[0,1]
  *    and the analytical solution
- *                E = [y(y-1) , x(x-1)], which fulfills E x n = 0  on delta Omega
+ *                w = x^3 (1 - x)^2 + y^2 (1 - y)^2
+ *                E = [dw/dy , -dw/dx] = [4y^3 - 6y^2 + 2y , -5x^4 + 8x^3 - 3x^2],
+ *    which fulfills E x n = 0  on delta Omega and is divergence-free by construction.
  *    It can then be calculated that we need to choose as source
- *                f = curl curl E + c E = [ c y^2 - c y - 2 , c x^2 - c x - 2]
+ *                f = curl curl E + c E = [ c (4y^3 - 6y^2 +2y) + 12 - 24y , -c (-5x^4 + 8x^3 - 3x^2) + 60x^2 - 48x + 6]
  *
+ *    Linear convergence is obtained (as expected).
  */
+
 int main() {
 
     double source[2]; // f
@@ -36,7 +40,7 @@ int main() {
     ElemType type = ElemType::Triangle;
 
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,2,type);
+    mesh->produceCartesian(dim,8,type);
     mesh->produceEdges();
 
     ReferenceElement* refElem = getReferenceElement(type,BFType::Nedelec,1);
@@ -82,12 +86,11 @@ int main() {
         if (edgesDir[e]) nBoundary++;
     }
 
-    printArray(nDOF,edgesDir);
-
     auto sysK = new Sparse_LIL(nDOF+nBoundary);
     double sysF[nDOF+nBoundary]; for(int i = 0; i < nDOF+nBoundary; ++i) sysF[i] = 0.0;
     double Area = 0.0;
 
+    // Integrate the equations
     for (int e = 0; e < nE; ++e) { // Loop in elements
         int nodes[nNbors], edges[nNbors], edgeSigns[nNbors];
         double nodeCoords[nNbors*dim];
@@ -168,8 +171,6 @@ int main() {
             sysF[edges[i]] += edgeSigns[i] * fe[i];
         }
     }
-
-    cout << "AREA = " << Area << endl;
 
     /** Apply boundaryDir conditions (using Lagrange multipliers)
      *           | A  K^t |
@@ -271,20 +272,20 @@ int main() {
                     auxE[i] += edgeSigns[j] * bfk[j*dim+i] * dofk[j];
                 }
             }
-            for (int i = 0; i < dim; ++i) {
+            for (int i = 0; i < dim; ++i) { // Needs to be multiplied by the Jacobian as part of Piola Transformation.
                 approxE[i] = 0.0;
                 for (int j = 0; j < dim; ++j) {
                     approxE[i] += Jinv[i*dim + j] * auxE[j];
                 }
             }
 
-            double pCoords[dim]; // Physical coordinates (x,y) of the
-            // Gauss point in this element
+            // Get exact solution
+            double pCoords[dim];
             refElem->getPhysicalCoords(k,nodeCoords,pCoords);
             double analE[2];
             double x = pCoords[0]; double y = pCoords[1];
-            analE[0] =  velocity*(4*y*y*y - 6*y*y+ 2*y);
-            analE[1] = -velocity*(-5*x*x*x*x+ 8*x*x*x - 3*x*x);
+            analE[0] =  (4*y*y*y - 6*y*y+ 2*y);
+            analE[1] = (-5*x*x*x*x+ 8*x*x*x - 3*x*x);
 
             double dV = wk * detJ;
             Error += ((analE[0] - approxE[0]) * (analE[0] - approxE[0]) + (analE[1] - approxE[1]) * (analE[1] - approxE[1])) * dV;

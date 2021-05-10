@@ -54,7 +54,6 @@ namespace upa {
 
         int _nG;      // Number of gauss points
         int _nB;      // Number of basis functions
-        int _nSol;    // Dimension of solutions: 1 == scalar, 2 == 2D vector, 3 == 3D vector
         double* _gW;  // Gauss weights
         double* _gC;  // Gauss points coordinates
         double* _bf;  // Basis functions evaluated at the gauss points
