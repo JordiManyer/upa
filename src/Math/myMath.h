@@ -3,8 +3,6 @@
 #ifndef UPA_MYMATH_H
 #define UPA_MYMATH_H
 
-#include <stdexcept>
-
 namespace upa {
 
     ///                             MISCELLANEOUS
@@ -37,6 +35,9 @@ namespace upa {
 
     //! @brief Performs the integral int{ y(x) dx} using Simpson's rule on the samples iStart <= i < iEnd.
     double Simpson(int iStart, int iEnd, const double *x, const double *y);
+
+    //! @brief Returns Gauss-Legendre quadratures in the interval [a,b]
+    void GLquad(int n, double a, double b, double* w, double* z);
 
 
 }
