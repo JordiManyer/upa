@@ -1,10 +1,10 @@
-# CMAKE for the Sparse Matrix library
+# CMAKE for the DataStructures Matrix library
 
 # Get source files
 file(GLOB SOURCES_H   *.h)
 file(GLOB SOURCES_CPP *.cpp)
 set(SOURCE_FILES ${SOURCES_H} ${SOURCES_CPP})
-set(LIBNAME upa_sparse)
+set(LIBNAME upa_dataStructures)
 
 # Build library
 add_library(${LIBNAME} ${SOURCE_FILES})

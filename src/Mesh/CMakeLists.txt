@@ -4,7 +4,7 @@
 file(GLOB SOURCES_H   *.h)
 file(GLOB SOURCES_CPP *.cpp)
 set(SOURCE_FILES ${SOURCES_H} ${SOURCES_CPP})
-set(LIBNAME upa_structmesh)
+set(LIBNAME upa_mesh)
 
 # Build library
 add_library(${LIBNAME} ${SOURCE_FILES})

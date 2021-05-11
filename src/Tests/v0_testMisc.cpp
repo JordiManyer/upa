@@ -2,24 +2,38 @@
 #include <iostream>
 #include "myMath.h"
 #include "debugIO.h"
+#include "mpi.h"
+#include "graph.h"
 
 using namespace std;
 using namespace upa;
 
 int main() {
+    MPI_Init(nullptr, nullptr);
+    cout << endl;
 
-    for (int i = 1; i < 5; ++i) {
-        double w[i], z[i];
-        GLquad(i,-1.0,1.0,w,z);
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-        cout << " > Order = " << i << endl;
-        cout << "   > Weights = " << endl;
-        printArray(i,w);
-        cout << "   > Coords = " << endl;
-        printArray(i,z);
-        cout << endl;
+    // Get the rank of the process
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+    //cout << endl << world_rank << endl;
+
+
+    if (world_rank == 0) {
+        int nNodes = 3;
+        int nEdges = 6;
+        int sizes[4] = {0,2,4,6};
+        int adjList[6] = {1,2,0,2,0,1};
+
+        Graph & G = *(new Graph(nNodes,nEdges,sizes,adjList));
+        cout << G(0,0) << endl;
     }
 
 
+
+    MPI_Finalize();
 }
 

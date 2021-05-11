@@ -17,6 +17,13 @@ set(UPA_BIN_INSTALL ${CMAKE_INSTALL_PREFIX}/bin)
 # Libraries
 set(UPA_LIBRARIES CACHE INTERNAL "UPA_LIBRARIES")
 
+# External libraries
+find_package(MPI REQUIRED)
+set(CMAKE_CXX_COMPILER mpicxx)
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
+find_package(VTK REQUIRED)
+
 # Includes
 file(GLOB UPA_INC_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/*)
 include_directories(${UPA_INC_DIRS})
@@ -27,8 +34,8 @@ add_subdirectory(src/IO)              # Input/Output routines
 add_subdirectory(src/Math)            # Basic Math
 add_subdirectory(src/Preconditioners) # Preconditioners and Iterators
 add_subdirectory(src/Solvers)         # Sparse Solvers
-add_subdirectory(src/Sparse)          # Sparse Matrices
-add_subdirectory(src/StructuredMesh)  # Meshes
+add_subdirectory(src/DataStructures)  # Data Structures (Sparse matrices, graphs, maps, ...)
+add_subdirectory(src/Mesh)  # Meshes
 
 add_subdirectory(src/Tests)           # Executables
 

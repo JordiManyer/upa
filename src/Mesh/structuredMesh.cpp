@@ -4,12 +4,12 @@
 namespace upa {
 
     void StructuredMesh::getElemNodes(int e, int *dofs) {
-        if (e > _nElems) throw std::runtime_error("StructuredMesh: Element ID out of range.");
+        if (e > _nElems) throw std::runtime_error("Mesh: Element ID out of range.");
         else for (int i = 0; i < _nNbors; ++i) dofs[i] = ENmap[e*_nNbors + i];
     }
 
     void StructuredMesh::getElemCoords(int e, double *dofCoords) {
-        if (e > _nElems) throw std::runtime_error("StructuredMesh: Element ID out of range.");
+        if (e > _nElems) throw std::runtime_error("Mesh: Element ID out of range.");
         else {
             for (int i = 0; i < _nNbors; ++i) {
                 int nodeID = ENmap[e * _nNbors + i];
@@ -19,27 +19,27 @@ namespace upa {
     }
 
     void StructuredMesh::getNodeCoords(int d, double *dofCoords) {
-        if (d > _nNodes) throw std::runtime_error("StructuredMesh: Node ID out of range.");
+        if (d > _nNodes) throw std::runtime_error("Mesh: Node ID out of range.");
         else for (int i = 0; i < _dim; ++i) dofCoords[i] = nodeCoords[d*_dim + i];
     }
 
     void StructuredMesh::getElemNbors(int e, int *nbors) {
-        if (e > _nElems) throw std::runtime_error("StructuredMesh: Elem ID out of range.");
+        if (e > _nElems) throw std::runtime_error("Mesh: Elem ID out of range.");
         else for (int i = 0; i < EEmap[e].size(); ++i) nbors[i] = EEmap[e][i];
     }
 
     void StructuredMesh::getNodeNbors(int d, int *nbors) {
-        if (d > _nNodes) throw std::runtime_error("StructuredMesh: Node ID out of range.");
+        if (d > _nNodes) throw std::runtime_error("Mesh: Node ID out of range.");
         else for (int i = 0; i < NNmap[d].size(); ++i) nbors[i] = NNmap[d][i];
     }
 
     void StructuredMesh::getElemEdges(int e, int *edges) {
-        if (e > _nElems) throw std::runtime_error("StructuredMesh: Elem ID out of range.");
+        if (e > _nElems) throw std::runtime_error("Mesh: Elem ID out of range.");
         else for (int i = 0; i < _nNbors; ++i) edges[i] = edgeMap[e*_nNbors+i];
     }
 
     void StructuredMesh::getEdgeNodes(int e, int *nodes) {
-        if (e > _nEdges) throw std::runtime_error("StructuredMesh: Edge ID out of range.");
+        if (e > _nEdges) throw std::runtime_error("Mesh: Edge ID out of range.");
         else for (int i = 0; i < 2; ++i) nodes[i] = edgeNodes[e*2+i];
     }
 
@@ -65,7 +65,7 @@ namespace upa {
         // Create connectivity matrix
         switch (_elemType) {
             case ElemType::Line:
-                if (dim != 1) throw std::runtime_error("StructuredMesh: ElemType::Line needs dim = 1");
+                if (dim != 1) throw std::runtime_error("Mesh: ElemType::Line needs dim = 1");
                 _nElems = ipow(nSide,dim);
                 _nNbors = 2;
                 ENmap = new int[_nElems*_nNbors];
@@ -87,7 +87,7 @@ namespace upa {
                 break;
 
             case ElemType::Square:
-                if (dim != 2) throw std::runtime_error("StructuredMesh: ElemType::Square needs dim = 2");
+                if (dim != 2) throw std::runtime_error("Mesh: ElemType::Square needs dim = 2");
                 _nElems = ipow(nSide,dim);
                 _nNbors = 4;
                 ENmap = new int[_nElems*_nNbors];
@@ -119,7 +119,7 @@ namespace upa {
                 break;
 
             case ElemType::Triangle:
-                if (dim != 2) throw std::runtime_error("StructuredMesh: ElemType::Triangle needs dim = 2");
+                if (dim != 2) throw std::runtime_error("Mesh: ElemType::Triangle needs dim = 2");
                 _nElems = 2*ipow(nSide,dim);
                 _nNbors = 3;
                 ENmap = new int[_nElems*_nNbors];
@@ -159,7 +159,7 @@ namespace upa {
                 break;
 
             default :
-                throw std::runtime_error("StructuredMesh: Element Type not recognised.");
+                throw std::runtime_error("Mesh: Element Type not recognised.");
 
         }
 
@@ -188,7 +188,7 @@ namespace upa {
             return true;
         } else if (_dim == 3) {
             /// TODO : Implement interior check for 3D elements
-            throw std::runtime_error("StructuredMesh: isInsideElement still not implemented for 3D.");
+            throw std::runtime_error("Mesh: isInsideElement still not implemented for 3D.");
         }
 
         return false;
@@ -230,7 +230,7 @@ namespace upa {
     }
 
     void StructuredMesh::produceEdges() {
-        if (_dim < 2) throw std::runtime_error("StructuredMesh: produceEdges() only for dim > 1.");
+        if (_dim < 2) throw std::runtime_error("Mesh: produceEdges() only for dim > 1.");
 
         // Count edges
         _nEdges = 0;
