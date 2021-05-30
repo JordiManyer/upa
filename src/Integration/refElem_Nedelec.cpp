@@ -1,5 +1,8 @@
 
 #include "refElem_Nedelec.h"
+#include "quadratures.h"
+
+#include <stdexcept>
 
 namespace upa {
 

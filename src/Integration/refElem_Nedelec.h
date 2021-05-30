@@ -4,7 +4,6 @@
 
 #include "elementDefinitions.h"
 #include "referenceElement.h"
-#include "refElem_Lagrange.h"
 
 namespace upa {
 

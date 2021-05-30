@@ -3,7 +3,6 @@
 #define UPA_REFELEM_LAGRANGE_H
 
 #include "elementDefinitions.h"
-#include "quadratures.h"
 #include "referenceElement.h"
 
 namespace upa {

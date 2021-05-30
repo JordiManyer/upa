@@ -1,7 +1,6 @@
 
 #include "refElem_Lagrange.h"
-#include <iostream>
-
+#include "quadratures.h"
 
 namespace upa {
 

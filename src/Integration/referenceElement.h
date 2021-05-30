@@ -3,8 +3,6 @@
 #ifndef UPA_REFERENCEELEMENT_H
 #define UPA_REFERENCEELEMENT_H
 
-#include <stdexcept>
-#include <cmath>
 #include "elementDefinitions.h"
 
 namespace upa {

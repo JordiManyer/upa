@@ -1,9 +1,7 @@
 #ifndef UPA_SPARSE_LIL_H
 #define UPA_SPARSE_LIL_H
 
-#include <algorithm>
 #include <vector>
-#include <utility>
 
 namespace upa {
 

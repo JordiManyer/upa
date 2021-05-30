@@ -4,6 +4,8 @@
 #include "refElem_Lagrange.h"
 #include "refElem_Nedelec.h"
 
+#include <stdexcept>
+
 namespace upa {
 
 

@@ -1,6 +1,8 @@
 
 
 #include "sparse_LIL.h"
+#include <algorithm>
+#include <utility>
 
 namespace upa {
 

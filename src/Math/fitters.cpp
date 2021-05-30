@@ -1,5 +1,5 @@
 
-
+#include <cmath>
 #include <iostream>
 #include "fitters.h"
 #include "directSolvers.h"

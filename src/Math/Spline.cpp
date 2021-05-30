@@ -1,6 +1,8 @@
 
 #include "Spline.h"
 
+#include <iostream>
+
 namespace upa {
 
     Spline::Spline(int n_in, const double *x_in, const double *y_in) {

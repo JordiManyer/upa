@@ -2,8 +2,6 @@
 #ifndef UPA_SPLINE_H
 #define UPA_SPLINE_H
 
-#include <iostream>
-
 namespace upa {
 
     /** @brief Cubic natural spline
