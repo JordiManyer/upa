@@ -1,5 +1,12 @@
 
 #include "structuredMesh.h"
+#include "myMath.h"
+
+#include <stdexcept>
+#include <queue>
+#include <utility>
+#include <cmath>
+#include "metis.h"
 
 namespace upa {
 
@@ -276,6 +283,19 @@ namespace upa {
                 edgeMap[e*_nNbors+i] = k;
             }
         }
+    }
+
+    void StructuredMesh::producePartition(int nProcs) {
+        _nParts = nProcs;
+        _epart = new int[_nElems]; _npart = new int[_nNodes];
+
+        idx_t nCommon = 2; idx_t objVal;
+        idx_t eptr[_nElems+1]; for (int i = 0; i < _nElems+1; ++i) eptr[i] = i * _nNbors;
+        int res =  METIS_PartMeshDual(&_nElems, &_nNodes, eptr, ENmap, nullptr, nullptr, &nCommon, &nProcs, nullptr, nullptr, &objVal, _epart, _npart);
+
+        if (res == METIS_ERROR_INPUT) throw std::runtime_error("Mesh::producePartition() -> METIS error METIS_ERROR_INPUT");
+        if (res == METIS_ERROR_MEMORY) throw std::runtime_error("Mesh::producePartition() -> METIS error METIS_ERROR_MEMORY");
+        if (res == METIS_ERROR) throw std::runtime_error("Mesh::producePartition() -> METIS error METIS_ERROR");
     }
 
 }

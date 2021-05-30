@@ -4,29 +4,29 @@
 
 namespace upa {
     Graph::Graph(int nNodes, int nEdges) {
-        _nNodes    = nNodes;
-        _nEdges    = nEdges;
-        _listSizes = new int[_nNodes+1];
-        _adjList   = new int[_nEdges];
+        _nN    = nNodes;
+        _nE    = nEdges;
+        _sizes = new int[_nN+1];
+        _nbors   = new int[_nE];
     }
 
     Graph::Graph(int nNodes, int nEdges, const int* sizes) {
-        _nNodes    = nNodes;
-        _nEdges    = nEdges;
-        _listSizes = new int[_nNodes+1];
-        _adjList   = new int[_nEdges];
+        _nN    = nNodes;
+        _nE    = nEdges;
+        _sizes = new int[_nN+1];
+        _nbors   = new int[_nE];
 
-        for (int i = 0; i < _nNodes+1; ++i) _listSizes[i] = sizes[i];
+        for (int i = 0; i < _nN+1; ++i) _sizes[i] = sizes[i];
     }
 
     Graph::Graph(int nNodes, int nEdges, const int* sizes, const int* entries) {
-        _nNodes    = nNodes;
-        _nEdges    = nEdges;
-        _listSizes = new int[_nNodes+1];
-        _adjList   = new int[_nEdges];
+        _nN    = nNodes;
+        _nE    = nEdges;
+        _sizes = new int[_nN+1];
+        _nbors   = new int[_nE];
 
-        for (int i = 0; i < _nNodes+1; ++i) _listSizes[i] = sizes[i];
-        for (int i = 0; i < _nEdges; ++i) _adjList[i]   = entries[i];
+        for (int i = 0; i < _nN+1; ++i) _sizes[i] = sizes[i];
+        for (int i = 0; i < _nE; ++i) _nbors[i]   = entries[i];
     }
 
 

@@ -16,13 +16,13 @@ namespace upa {
         ~Graph() = default;
 
         // Read / Write operators
-        int operator()(int i, int j) const { return _adjList[_listSizes[i] + j]; }
-        int &operator()(int i, int j) { return _adjList[_listSizes[i] + j]; }
+        int operator()(int i, int j) const { return _nbors[_sizes[i] + j]; }
+        int &operator()(int i, int j) { return _nbors[_sizes[i] + j]; }
 
-        int _nNodes;
-        int _nEdges;
-        int *_listSizes;
-        int *_adjList;
+        int _nN;     // Number of nodes in the graph
+        int _nE;     // Number of directed edges in the graph
+        int *_sizes; // Indexes where each sublist starts (size _nN+1)
+        int *_nbors; // Concatenated lists of neighbors for each node (size _nE)
     };
 
 }

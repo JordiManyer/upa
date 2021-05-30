@@ -3,14 +3,8 @@
 #ifndef UPA_STRUCTUREDMESH_H
 #define UPA_STRUCTUREDMESH_H
 
-#include <stdexcept>
 #include <vector>
-#include <queue>
-#include <utility>
-#include <iostream>
-
-#include "myMath.h"
-#include "referenceElement.h"
+#include "elementDefinitions.h"
 
 namespace upa {
 
@@ -58,7 +52,9 @@ namespace upa {
         // Edge elements
         void produceEdges();
 
-    private:
+        // Mesh distribution
+        void producePartition(int nProcs);
+
         int _nElems; // Number of elements in the mesh
         int _nNodes; // Number of nodes in the mesh
         int _nNbors; // Number of neighboring nodes per element
@@ -75,6 +71,10 @@ namespace upa {
         int *edgeNodes;           // Nodes in each edge [nEdges,2]
         int *edgeMap;             // Element-Edge map [nElems,nNbors]
 
+        // Mesh distribution
+        int _nParts;
+        int *_epart;
+        int *_npart;
     };
 
 }

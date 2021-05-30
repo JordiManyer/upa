@@ -1,7 +1,5 @@
 
 #include <iostream>
-#include "myMath.h"
-#include "debugIO.h"
 #include "mpi.h"
 #include "graph.h"
 
@@ -31,7 +29,6 @@ int main() {
         Graph & G = *(new Graph(nNodes,nEdges,sizes,adjList));
         cout << G(0,0) << endl;
     }
-
 
 
     MPI_Finalize();

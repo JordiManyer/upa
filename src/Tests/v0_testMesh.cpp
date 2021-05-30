@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include "structuredMesh.h"
+#include "debugIO.h"
+#include "metis.h"
 
 using namespace std;
 using namespace upa;
@@ -11,7 +13,7 @@ int main() {
 
     int dim = 2;
     StructuredMesh* mesh = new StructuredMesh();
-    mesh->produceCartesian(dim,2,ElemType::Triangle);
+    mesh->produceCartesian(dim,4,ElemType::Square);
     mesh->produceEdges();
 
     int nE = mesh->getNumElements();
@@ -73,6 +75,13 @@ int main() {
         cout << "  -> Edge " << i << ":: " << nodes[0] << " - " << nodes[1];
         cout << endl;
     }
+    cout << endl;
+
+    // Partitioning using metis
+    cout << "Mesh partitioning: " << endl;
+    mesh->producePartition(4);
+    printArray(nE,mesh->_epart);
+    printArray(nN,mesh->_npart);
     cout << endl;
 
     double p[2] = {0.7,0.9};

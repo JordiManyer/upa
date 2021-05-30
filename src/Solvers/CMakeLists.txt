@@ -9,6 +9,7 @@ set(LIBNAME upa_solvers)
 # Build library
 add_library(${LIBNAME} ${SOURCE_FILES})
 target_link_libraries(${LIBNAME} ${UPA_LIBRARIES})
+target_link_libraries(${LIBNAME} ${EXTERNAL_LIBRARIES})
 
 install(TARGETS ${LIBNAME} DESTINATION ${UPA_LIBS_INSTALL})
 install(FILES ${SOURCES_H} DESTINATION ${UPA_INCLUDE_INSTALL})
