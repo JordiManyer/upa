@@ -287,6 +287,7 @@ namespace upa {
 
     void StructuredMesh::producePartition(int nProcs) {
         _nParts = nProcs;
+        delete[] _epart; delete[] _npart;
         _epart = new int[_nElems]; _npart = new int[_nNodes];
 
         idx_t nCommon = 2; idx_t objVal;
