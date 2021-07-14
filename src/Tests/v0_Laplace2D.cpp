@@ -1,10 +1,12 @@
 
 #include <iostream>
+#include <cmath>
 #include "structuredMesh.h"
 #include "sparse_LIL.h"
 #include "sparse_CSR.h"
 #include "referenceElement.h"
 #include "solver_CG.h"
+#include "myMath.h"
 
 using namespace std;
 using namespace upa;

@@ -1,7 +1,7 @@
 
 #include "Spline.h"
 
-#include <iostream>
+#include <stdexcept>
 
 namespace upa {
 

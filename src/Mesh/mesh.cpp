@@ -6,6 +6,7 @@
 #include <set>
 #include <iterator>
 #include <algorithm>
+#include <iostream>
 
 namespace upa {
 
